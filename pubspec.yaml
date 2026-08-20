@@ -1,0 +1,37 @@
+name: mavishim
+description: "Private cycle wellness and couples connection application."
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  provider: ^6.1.5+1
+  table_calendar: ^3.2.0
+  shared_preferences: ^2.5.5
+  intl: ^0.20.2
+  confetti: ^0.8.0
+  hive_ce_flutter: ^2.3.4
+  flutter_secure_storage: ^11.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/branding/
+  fonts:
+    - family: Outfit
+      fonts:
+        - asset: assets/fonts/Outfit-Variable.ttf

@@ -1,0 +1,19 @@
+{
+  "@@locale": "tr",
+  "appTitle": "Mavishim",
+  "cycleTab": "Döngüm",
+  "calendarTab": "Takvim",
+  "gamesTab": "Oyunlar",
+  "notesTab": "Notlar",
+  "settingsTab": "Ayarlar",
+  "today": "Bugün",
+  "dailyMood": "Günlük Mod",
+  "dailyDesire": "Günlük İstek",
+  "select": "Seçim yap",
+  "save": "Kaydet",
+  "cancel": "Vazgeç",
+  "delete": "Sil",
+  "privacy": "Gizlilik",
+  "deleteAllData": "Tüm Verilerimi Sil",
+  "retry": "Tekrar Dene"
+}
