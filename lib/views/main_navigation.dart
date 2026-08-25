@@ -21,14 +21,14 @@ class MainNavigationView extends StatefulWidget {
 class _MainNavigationViewState extends State<MainNavigationView> {
   int _currentIndex = 0;
   String? _lastShownError;
+  late final List<Widget?> _pages;
 
-  static const _pages = <Widget>[
-    TapEffectsLayer(surfaceId: 'cycle-dashboard', child: CycleDashboard()),
-    TapEffectsLayer(surfaceId: 'calendar', child: CycleCalendarView()),
-    TapEffectsLayer(surfaceId: 'games-hub', child: GamesHubView()),
-    TapEffectsLayer(surfaceId: 'notes', child: LoveNotesView()),
-    TapEffectsLayer(surfaceId: 'settings', child: SettingsView()),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _pages = List<Widget?>.filled(5, null);
+    _pages[0] = _createPage(0);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,11 +42,23 @@ class _MainNavigationViewState extends State<MainNavigationView> {
     _scheduleErrorMessage(cycleError ?? gameError);
 
     return Scaffold(
-      body: IndexedStack(index: _currentIndex, children: _pages),
+      body: IndexedStack(
+        index: _currentIndex,
+        children: List.generate(
+          _pages.length,
+          (index) => _pages[index] ?? const SizedBox.shrink(),
+        ),
+      ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-        onDestinationSelected: (index) => setState(() => _currentIndex = index),
+        onDestinationSelected: (index) {
+          if (index == _currentIndex) return;
+          setState(() {
+            _currentIndex = index;
+            _pages[index] ??= _createPage(index);
+          });
+        },
         destinations: [
           NavigationDestination(
             icon: const Icon(Icons.spa_outlined),
@@ -77,6 +89,20 @@ class _MainNavigationViewState extends State<MainNavigationView> {
       ),
     );
   }
+
+  Widget _createPage(int index) => switch (index) {
+    0 => const TapEffectsLayer(
+      surfaceId: 'cycle-dashboard',
+      child: CycleDashboard(),
+    ),
+    1 => const TapEffectsLayer(
+      surfaceId: 'calendar',
+      child: CycleCalendarView(),
+    ),
+    2 => const TapEffectsLayer(surfaceId: 'games-hub', child: GamesHubView()),
+    3 => const TapEffectsLayer(surfaceId: 'notes', child: LoveNotesView()),
+    _ => const TapEffectsLayer(surfaceId: 'settings', child: SettingsView()),
+  };
 
   void _scheduleErrorMessage(String? message) {
     if (message == null || message == _lastShownError) return;

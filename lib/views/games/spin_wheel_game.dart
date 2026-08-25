@@ -30,7 +30,7 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
   void initState() {
     super.initState();
     _confettiController = ConfettiController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 1200),
     );
     _controller = AnimationController(
       vsync: this,
@@ -312,6 +312,10 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
+              numberOfParticles: 10,
+              emissionFrequency: 0.025,
+              maxBlastForce: 12,
+              minBlastForce: 5,
             ),
           ),
         ],

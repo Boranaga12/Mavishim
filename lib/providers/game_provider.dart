@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
@@ -15,7 +16,9 @@ class GameProvider with ChangeNotifier {
   late int _activeWheelIndex;
   late List<WheelModel> _wheels;
   late List<QuizQuestion> _quizQuestions;
+  late Map<String, int> _gameProgress;
   String? _errorMessage;
+  Timer? _progressSaveTimer;
 
   GameProvider(this._repository, AppDataSnapshot snapshot) {
     _memoryBestScore = snapshot.memoryBestScore;
@@ -27,6 +30,7 @@ class GameProvider with ChangeNotifier {
         .clamp(0, _wheels.length - 1)
         .toInt();
     _quizQuestions = List.of(snapshot.quizQuestions);
+    _gameProgress = Map.of(snapshot.gameProgress);
   }
 
   int get memoryBestScore => _memoryBestScore;
@@ -36,6 +40,8 @@ class GameProvider with ChangeNotifier {
   UnmodifiableListView<QuizQuestion> get quizQuestions =>
       UnmodifiableListView(_quizQuestions);
   String? get errorMessage => _errorMessage;
+  int progressFor(String gameId) => _gameProgress[gameId] ?? 0;
+  int get quizCursor => progressFor('quizCursor');
 
   WheelModel get activeWheel => _wheels[_activeWheelIndex];
 
@@ -88,6 +94,31 @@ class GameProvider with ChangeNotifier {
     notifyListeners();
     if (!await _persist()) _restore(previous);
   }
+
+  Future<void> saveProgress(String gameId, int value) async {
+    if (_gameProgress[gameId] == value) return;
+    _gameProgress[gameId] = value;
+    notifyListeners();
+    // Rapid-tap games can score many times per second. Coalesce those writes
+    // so encryption and disk I/O never run once per frame/tap.
+    _progressSaveTimer?.cancel();
+    _progressSaveTimer = Timer(
+      const Duration(milliseconds: 220),
+      () => unawaited(_flushGameProgress()),
+    );
+  }
+
+  Future<void> _flushGameProgress() async {
+    _progressSaveTimer = null;
+    try {
+      await _repository.saveGameProgress(_gameProgress);
+    } catch (_) {
+      _errorMessage = 'Oyun ilerlemesi kaydedilemedi.';
+      notifyListeners();
+    }
+  }
+
+  Future<void> advanceQuiz() => saveProgress('quizCursor', quizCursor + 1);
 
   Future<void> addOptionToActiveWheel(String option) async {
     final value = option.trim();
@@ -149,6 +180,7 @@ class GameProvider with ChangeNotifier {
     _activeWheelIndex = 0;
     _wheels = List.of(defaultWheels);
     _quizQuestions = List.of(customQuizQuestions);
+    _gameProgress = {};
     _errorMessage = null;
     notifyListeners();
   }
@@ -157,6 +189,15 @@ class GameProvider with ChangeNotifier {
     if (_errorMessage == null) return;
     _errorMessage = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _progressSaveTimer?.cancel();
+    if (_progressSaveTimer != null) {
+      unawaited(_flushGameProgress());
+    }
+    super.dispose();
   }
 
   void _replaceActive(WheelModel wheel) {

@@ -2,6 +2,9 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/game_provider.dart';
 
 class ColorHuntGameView extends StatefulWidget {
   const ColorHuntGameView({super.key});
@@ -28,6 +31,7 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
   @override
   void initState() {
     super.initState();
+    _level = max(1, context.read<GameProvider>().progressFor('colorHunt'));
     _startLevel();
   }
 
@@ -57,6 +61,7 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
   void _select(int tile) {
     if (_gameOver || _restingEyes || _shuffling) return;
     if (tile == _oddIndex) {
+      context.read<GameProvider>().saveProgress('colorHunt', _level + 1);
       setState(() {
         _level++;
         _hearts = 3;

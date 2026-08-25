@@ -6,6 +6,7 @@ import '../../providers/game_provider.dart';
 import '../../widgets/glass_card.dart';
 import '../../widgets/tap_effects_layer.dart';
 import 'couple_quiz_game.dart';
+import 'cute_arcade_games.dart';
 import 'memory_game.dart';
 import 'minesweeper_game.dart';
 import 'pink_mini_games.dart';
@@ -16,9 +17,7 @@ class GamesHubView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final scores = context.select<GameProvider, (int, int)>(
-      (provider) => (provider.quizBestScore, provider.memoryBestScore),
-    );
+    final entries = _gameEntries();
     return Scaffold(
       body: DecoratedBox(
         decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
@@ -38,68 +37,28 @@ class GamesHubView extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Kısa, rahat ve keyifli oyunlar.',
-                  style: TextStyle(fontSize: 14, color: Colors.grey.shade700),
+                  'İlerlemen otomatik kaydedilir; istediğin zaman devam et.',
+                  style: TextStyle(color: Colors.grey.shade700),
                 ),
                 const SizedBox(height: 16),
                 Expanded(
-                  child: ListView(
-                    children: [
-                      _card(
+                  child: ListView.separated(
+                    itemCount: entries.length,
+                    cacheExtent: 300,
+                    separatorBuilder: (_, _) => _gap,
+                    itemBuilder: (context, index) {
+                      final entry = entries[index];
+                      return _card(
                         context,
-                        'Karar & Plan Çarkıfeleği 🎡',
-                        'Evde ne yapılacağına bir çevirişte karar ver.',
-                        Icons.pie_chart_outline_rounded,
-                        AppTheme.primaryPink,
-                        'Karar zamanı',
-                        'wheel',
-                        const SpinWheelGameView(),
-                      ),
-                      const SizedBox(height: 12),
-                      _card(
-                        context,
-                        'Onu Ne Kadar Tanıyorsun? 💌',
-                        'Sorularla ne kadar dikkatli olduğunu dene.',
-                        Icons.quiz_rounded,
-                        Colors.purple,
-                        'En yüksek: %${scores.$1}',
-                        'quiz',
-                        const CoupleQuizGameView(),
-                      ),
-                      const SizedBox(height: 12),
-                      _card(
-                        context,
-                        'Hafıza Kartları 🃏',
-                        'Eşleşen simgeleri bul.',
-                        Icons.grid_view_rounded,
-                        Colors.teal,
-                        scores.$2 > 0 ? 'Rekor: ${scores.$2}' : 'Oyna',
-                        'memory',
-                        const MemoryGameView(),
-                      ),
-                      const SizedBox(height: 12),
-                      _card(
-                        context,
-                        'Renk Avı',
-                        'Farklı renk kutucuğunu bul; seviyeler sonsuza dek zorlaşır.',
-                        Icons.palette_rounded,
-                        AppTheme.primaryPink,
-                        'Oyna',
-                        'color-hunt',
-                        const ColorHuntGameView(),
-                      ),
-                      const SizedBox(height: 12),
-                      _card(
-                        context,
-                        'Mayın Tarlası',
-                        'Mayınlara basmadan güvenli kutuları aç.',
-                        Icons.grid_4x4_rounded,
-                        Colors.indigo,
-                        'Oyna',
-                        'minesweeper',
-                        const MinesweeperGameView(),
-                      ),
-                    ],
+                        entry.title,
+                        entry.description,
+                        entry.icon,
+                        entry.color,
+                        entry.badge,
+                        entry.surfaceId,
+                        entry.page,
+                      );
+                    },
                   ),
                 ),
               ],
@@ -110,13 +69,80 @@ class GamesHubView extends StatelessWidget {
     );
   }
 
+  static const _gap = SizedBox(height: 12);
+
+  List<_GameEntry> _gameEntries() => [
+    const _GameEntry(
+      title: 'Karar & Plan Çarkıfeleği 🎡',
+      description: 'Evde ne yapılacağına bir çevirişte karar ver.',
+      icon: Icons.pie_chart_outline_rounded,
+      color: AppTheme.primaryPink,
+      badge: Text('Aç'),
+      surfaceId: 'wheel',
+      page: SpinWheelGameView(),
+    ),
+    const _GameEntry(
+      title: 'Onu Ne Kadar Tanıyorsun? 💌',
+      description: 'Sen çıkana kadar yeni sorularla devam eder.',
+      icon: Icons.quiz_rounded,
+      color: Colors.purple,
+      badge: _GameProgressBadge(kind: _BadgeKind.quiz),
+      surfaceId: 'quiz',
+      page: CoupleQuizGameView(),
+    ),
+    const _GameEntry(
+      title: 'Hafıza Kartları 🃏',
+      description: 'Eşleşen simgeleri bul.',
+      icon: Icons.grid_view_rounded,
+      color: Colors.teal,
+      badge: _GameProgressBadge(kind: _BadgeKind.memory),
+      surfaceId: 'memory',
+      page: MemoryGameView(),
+    ),
+    const _GameEntry(
+      title: 'Renk Avı',
+      description: '36 kutucuk arasındaki farklı tonu yakala.',
+      icon: Icons.palette_rounded,
+      color: AppTheme.primaryPink,
+      badge: _GameProgressBadge(progressKey: 'colorHunt'),
+      surfaceId: 'color-hunt',
+      page: ColorHuntGameView(),
+    ),
+    const _GameEntry(
+      title: 'Mayın Tarlası',
+      description: 'Mayınlara basmadan güvenli kutuları aç.',
+      icon: Icons.grid_4x4_rounded,
+      color: Colors.indigo,
+      badge: _GameProgressBadge(progressKey: 'minesweeper'),
+      surfaceId: 'minesweeper',
+      page: MinesweeperGameView(),
+    ),
+    for (final game in CuteArcadeGame.values)
+      _GameEntry(
+        title: game.title,
+        description: game.description,
+        icon: game.icon,
+        color: _gameColor(game.index),
+        badge: _GameProgressBadge(progressKey: 'arcade_${game.name}'),
+        surfaceId: 'arcade-${game.name}',
+        page: CuteArcadeGameView(game: game),
+      ),
+  ];
+
+  Color _gameColor(int index) => [
+    const Color(0xFFFF5E9B),
+    const Color(0xFFB36AE2),
+    const Color(0xFF6FC8C2),
+    const Color(0xFFFF9F68),
+  ][index % 4];
+
   Widget _card(
     BuildContext context,
     String title,
     String description,
     IconData icon,
     Color color,
-    String badge,
+    Widget badge,
     String surfaceId,
     Widget page,
   ) => GlassCard(
@@ -126,34 +152,86 @@ class GamesHubView extends StatelessWidget {
         builder: (_) => TapEffectsLayer(surfaceId: surfaceId, child: page),
       ),
     ),
-    padding: const EdgeInsets.all(16),
+    padding: const EdgeInsets.all(15),
     child: Row(
       children: [
         Container(
-          padding: const EdgeInsets.all(14),
+          padding: const EdgeInsets.all(13),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.15),
+            color: color.withValues(alpha: 0.14),
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Icon(icon, size: 28, color: color),
+          child: Icon(icon, color: color),
         ),
-        const SizedBox(width: 14),
+        const SizedBox(width: 13),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 4),
-              Text(description, style: TextStyle(color: Colors.grey.shade700)),
+              Text(
+                description,
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+              ),
             ],
           ),
         ),
         const SizedBox(width: 8),
-        Text(
-          badge,
-          style: TextStyle(color: color, fontWeight: FontWeight.bold),
+        DefaultTextStyle(
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.bold,
+          ),
+          child: badge,
         ),
       ],
     ),
   );
+}
+
+class _GameEntry {
+  final String title;
+  final String description;
+  final IconData icon;
+  final Color color;
+  final Widget badge;
+  final String surfaceId;
+  final Widget page;
+
+  const _GameEntry({
+    required this.title,
+    required this.description,
+    required this.icon,
+    required this.color,
+    required this.badge,
+    required this.surfaceId,
+    required this.page,
+  });
+}
+
+enum _BadgeKind { progress, quiz, memory }
+
+class _GameProgressBadge extends StatelessWidget {
+  final _BadgeKind kind;
+  final String? progressKey;
+
+  const _GameProgressBadge({this.kind = _BadgeKind.progress, this.progressKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final value = context.select<GameProvider, int>((provider) {
+      return switch (kind) {
+        _BadgeKind.quiz => provider.quizCursor,
+        _BadgeKind.memory => provider.memoryBestScore,
+        _BadgeKind.progress => provider.progressFor(progressKey!),
+      };
+    });
+    return Text(switch (kind) {
+      _BadgeKind.quiz => value > 0 ? 'Devam et' : 'Başla',
+      _BadgeKind.memory => value > 0 ? 'Rekor $value' : 'Oyna',
+      _BadgeKind.progress => value > 0 ? 'Puan $value' : 'Oyna',
+    });
+  }
 }

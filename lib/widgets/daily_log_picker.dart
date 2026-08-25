@@ -160,6 +160,9 @@ abstract final class DailyLogPicker {
         ),
       ),
     );
+    // Let the bottom sheet finish its reverse animation before releasing the
+    // controller; the TextField can still paint for a frame after pop().
+    await Future<void>.delayed(const Duration(milliseconds: 400));
     controller.dispose();
   }
 

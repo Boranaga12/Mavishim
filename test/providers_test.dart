@@ -35,8 +35,11 @@ void main() {
 
     await provider.createCustomWheel('Randevu', ['Sinema', 'Piknik']);
     await provider.updateQuizScore(140);
+    await provider.saveProgress('arcade_reaction', 7);
+    await Future<void>.delayed(const Duration(milliseconds: 250));
 
     expect(repository.snapshot.wheels.last.title, 'Randevu');
     expect(provider.quizBestScore, 100);
+    expect(repository.snapshot.gameProgress['arcade_reaction'], 7);
   });
 }

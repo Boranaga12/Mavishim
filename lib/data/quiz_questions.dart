@@ -40,52 +40,12 @@ class QuizQuestion {
   }
 }
 
-/// Keeps the question subject neutral while preserving personalized answers.
-QuizQuestion restoreElifPhrasing(QuizQuestion question) {
-  String restore(String value) => value
-      .replaceAll('Sevgilisinin', 'Elifimin')
-      .replaceAll('Sevgilisini', 'Elifimi')
-      .replaceAll('Sevgilisiyle', 'Elifimle')
-      .replaceAll('Sevgilisine', 'Elifime')
-      .replaceAll('Sevgilisinden', 'Elifimden')
-      .replaceAll('Sevgilisi', 'Elifim')
-      .replaceAll('Sevgilim kelimesini', 'Elifim kelimesini')
-      .replaceAll(
-        'Birlikte kurdukları hayalleri',
-        'Elifimle kurduğumuz hayalleri',
-      )
-      .replaceAll('Birlikte bir geleceği', 'Elifimle bir geleceği');
-
-  final restoredQuestion = question.question.replaceFirst(
-    RegExp(r'^Elifim '),
-    'O ',
-  );
-  final restoredOptions = question.options.map(restore).toList();
-  if (restoredQuestion == question.question &&
-      _sameTextList(restoredOptions, question.options)) {
-    return question;
-  }
-  return QuizQuestion(
-    question: restoredQuestion,
-    options: restoredOptions,
-    correctIndex: question.correctIndex,
-  );
-}
-
-bool _sameTextList(List<String> first, List<String> second) {
-  if (first.length != second.length) return false;
-  for (var index = 0; index < first.length; index++) {
-    if (first[index] != second[index]) return false;
-  }
-  return true;
-}
-
 final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O hangi yemeği yemeyi daha çok sever?',
     options: [
       'Ev Yapımı Pizza 🍕',
-      'Elifimi 💖',
+      'Elifini 💖',
       'İskender Kebap 🥩',
       'Kremalı Makarna 🍝',
     ],
@@ -96,7 +56,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Demleme Çay ☕',
       'Soğuk Kahve 🧊',
-      'Elifimin hazırladığı içeceği 🥛',
+      'Elifinin sütünü 🥛',
       'Taze Portakal Suyu 🍊',
     ],
     correctIndex: 2,
@@ -104,7 +64,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O hangi tatlıyı asla geri çeviremez?',
     options: [
-      'Elifimin seçtiği tatlıyı 🍩',
+      'Elifinin bal damlayan dudakları 💋',
       'Fıstıklı Baklava 🥮',
       'Sıcak Sufle 🍫',
       'San Sebastian Cheesecake 🍰',
@@ -112,13 +72,12 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     correctIndex: 0,
   ),
   QuizQuestion(
-    question:
-        'Elifim boş zamanlarında hangi aktiviteyi yapmayı daha çok sever?',
+    question: 'O boş zamanlarında hangi aktiviteyi yapmayı daha çok sever?',
     options: [
       'Bilgisayar Oyunu Oynamak 🎮',
       'Spor Yapmak 🏋️',
       'Kitap Okumak 📚',
-      'Elifimle ilgilenmeyi 🌸',
+      'Elifiyle ilgilenmek 🌸',
     ],
     correctIndex: 3,
   ),
@@ -126,7 +85,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     question: 'O hangi tür filmleri/dizileri izlemeyi daha çok sever?',
     options: [
       'Aksiyon ve Macera 💥',
-      'Elifimin seçtiği dizileri 🎬',
+      'Elifinin rüya sekansı 🎬',
       'Bilim Kurgu 🚀',
       'Korku ve Gerilim 👻',
     ],
@@ -137,7 +96,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Türkçe Pop 🎵',
       'Yabancı Rock 🎸',
-      'Elifimin sesini 🎶',
+      'Elifinin sesini 🎶',
       'Akustik Gitar 🎼',
     ],
     correctIndex: 2,
@@ -145,7 +104,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O evde vakit geçirirken hangisini yapmayı daha çok sever?',
     options: [
-      'Elifimle eğlenmeyi 🤪',
+      'Elifiyle fantezileşmek 🤪',
       'Temizlik Yapmak 🧹',
       'Uyumak 😴',
       'Televizyon İzlemek 📺',
@@ -158,7 +117,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
       'Erken Sabah Saatlerinde 🌅',
       'Öğle Sıcağında ☀️',
       'Gece Yarısında 🌙',
-      'Elifimle birlikteyken ⚡',
+      'Elifiyle birlikteyken ⚡',
     ],
     correctIndex: 3,
   ),
@@ -166,9 +125,9 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     question: 'O telefonda en çok hangi uygulamada vakit geçirir?',
     options: [
       'Instagram Reels 📸',
-      'Elifimle konuştuğu uygulamada 📱',
+      'Elifiyle konuştuğu uygulama 📱',
       'YouTube Videosu 📹',
-      'TikTok 🎵',
+      'Clash Royale 🎮',
     ],
     correctIndex: 1,
   ),
@@ -177,7 +136,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Müzik Dinlemek 🎧',
       'Yürüyüş Yapmak 🚶',
-      'Elifime sarılarak uyumayı 🛌',
+      'Elifiyle sarılarak uyumak 🛌',
       'Sıcak Banyo Yapmak 🛁',
     ],
     correctIndex: 2,
@@ -185,7 +144,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O tatilde nasıl bir yere gitmeyi daha çok sever?',
     options: [
-      'Elifimin yanına ✈️',
+      'Elifinin yanına ✈️',
       'Sakin Bir Sahil Kasabası 🏖️',
       'Doğa İçi Dağ Evi 🏔️',
       'Tarihi Şehir Turu 🏛️',
@@ -197,17 +156,16 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Sıcak Yaz Günleri ☀️',
       'Karlı Kış Geceleri ❄️',
-      'Çiçekli İlkbahar 🌸',
-      'Sonbahar 🍂',
+      'Elifiyle Olan Mevsimleri 🌸',
+      'Yağmurlu Sonbaharı 🍂',
     ],
     correctIndex: 3,
   ),
   QuizQuestion(
-    question:
-        'Elifim dışarı çıktığında nasıl mekanlarda oturmayı daha çok sever?',
+    question: 'O dışarı çıktığında nasıl mekanlarda oturmayı daha çok sever?',
     options: [
       'Kalabalık Restoranlar 🍔',
-      'Elifimin yanında olduğu mekanlarda ☕',
+      'Elifiyle yalnız olduğu mekanlarda ☕',
       'Sakin Kahve Dükkanları ☕',
       'Açık Hava Parkları 🌳',
     ],
@@ -218,7 +176,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Taze Kahve Kokusu ☕',
       'Yağmur Sonrası Toprak Kokusu 🌧️',
-      'Elifimin kokusunu 🌸',
+      'Elifinin kokusu 🌸',
       'Vanilya Parfümü 🕯️',
     ],
     correctIndex: 2,
@@ -226,7 +184,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O en çok hangi sesi duymak ister?',
     options: [
-      'Elifimin gülüşünü 😊',
+      'Elifinin gülüşü 😊',
       'Dalga Sesleri 🌊',
       'Kuş Cıvıltıları 🐦',
       'Yağmur Damlaları 🌧️',
@@ -239,7 +197,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
       'Deniz Batımı Manzarası 🌅',
       'Gece Şehir Işıkları 🏙️',
       'Yıldızlı Gökyüzü 🌌',
-      'Elifimin gözlerini 👀',
+      'Elifinin gözleri 👀',
     ],
     correctIndex: 3,
   ),
@@ -247,7 +205,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     question: 'O stresli olduğunda ne yapmak ona iyi gelir?',
     options: [
       'Yalnız Kalmak 🤫',
-      'Elifime sarılmayı 🫂',
+      'Elifiyle sarılmak 🫂',
       'Derin Nefes Almak 🧘',
       'Papatya Çayı İçmek 🍵',
     ],
@@ -258,15 +216,15 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Kendi Çocukluk Odası 🛏️',
       'Doğadaki Sakin Bir Orman 🌲',
-      'Elifimin yanı 🏡',
+      'Elifinin yanı 🏡',
       'Evdeki Koltuğu 🛋️',
     ],
     correctIndex: 2,
   ),
   QuizQuestion(
-    question: 'O sabahları uyanmak için en me çok neye ihtiyaç duyar?',
+    question: 'O sabahları uyanmak için en çok neye ihtiyaç duyar?',
     options: [
-      'Elifimden gelen günaydın mesajına 📲',
+      'Elifinden gelen günaydın mesajına 📲',
       'Sert Bir Filtre Kahveye ☕',
       'Yüksek Sesli Alarma ⏰',
       'Soğuk Suya 💦',
@@ -278,7 +236,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       '8 Saat Uykusunu Almak 💤',
       'Enerji İçeceği ⚡',
-      'Elifimin tatlı bir sözü 💬',
+      'Elifinin tatlı bir sözü 💬',
       'Sessizce Uzanmak 🛌',
     ],
     correctIndex: 2,
@@ -286,7 +244,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O hayatında en çok neyi tutmak ister?',
     options: [
-      'Elifimin elini 🤝',
+      'Elifinin elini 🤝',
       'Direksiyonu 🚘',
       'Kendi İşini 💼',
       'Kendi Özgürlüğünü 🕊️',
@@ -297,7 +255,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     question: 'O en çok hangi bildirimi görmeyi sever?',
     options: [
       'Banka Hesap Bildirimini 💰',
-      'Elifimden gelen mesajı 💌',
+      'Elifinden gelen mesajı 💌',
       'Sosyal Medya Beğenisini 👍',
       'İndirim Bildirimini 🏷️',
     ],
@@ -308,7 +266,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Ağrı Kesici 💊',
       'Nane Limon Çayı 🍋',
-      'Elifimin öpücüğünü 💋',
+      'Elifinin öpücüğü 💋',
       'C Vitamini 🍊',
     ],
     correctIndex: 2,
@@ -316,7 +274,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O kışın ısınmak için neye sarılır?',
     options: [
-      'Elifimin sıcaklığına 🔥',
+      'Elifinin göbüşüne 🔥',
       'Kalın Polar Battaniyeye 🧶',
       'Elektrikli Sobaya ♨️',
       'Yün Çoraplara 🧦',
@@ -324,11 +282,11 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     correctIndex: 0,
   ),
   QuizQuestion(
-    question: 'O hangi fotoğrafına bakmaktan bıkmaz?',
+    question: 'O hangi fotoğrafa bakmaktan bıkmaz?',
     options: [
       'Manzara Fotoğraflarına 🏔️',
       'Kendi Çocukluk Fotoğrafına 👶',
-      'Elifimin bulunduğu herhangi bir fotoğrafa 📸',
+      'Elifinin bir pikselinin bulunduğu herhangi bir fotoğrafa 📸',
       'Araba Fotoğraflarına 🏎️',
     ],
     correctIndex: 2,
@@ -336,7 +294,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O en çok hangi hediyeyi almak ister?',
     options: [
-      'Elifimin varlığını 🎁',
+      'Elifinin varlığı 🎁',
       'Son Model Telefon 📱',
       'Pahalı Bir Saat ⌚',
       'Marka Kıyafetler 👕',
@@ -347,7 +305,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     question: 'O ne zaman kendini eksik hisseder?',
     options: [
       'Cüzdanı Boşken 💸',
-      'Elifimden uzak kaldığında 💔',
+      'Elifinden uzak kaldığında 💔',
       'Karnı Açken 🍔',
       'İnterneti Bittiğinde 🌐',
     ],
@@ -358,26 +316,21 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Yarın Yapılacak İşleri 📝',
       'Günün Yorgunluğunu 🥱',
-      'Elifimle kurduğumuz hayalleri 💭',
+      'Elifiyle kurduğu hayalleri 💭',
       'İzlediği Filmi 🍿',
     ],
     correctIndex: 2,
   ),
   QuizQuestion(
     question: 'O en çok hangi kelimeyi söylemeyi sever?',
-    options: [
-      'Elifim kelimesini 🗣️',
-      'Aynen 💬',
-      'Fark Etmez 🤷',
-      'Hallederiz 👍',
-    ],
+    options: ['Elifim 🗣️', 'Aynen 💬', 'Fark Etmez 🤷', 'Hallederiz 👍'],
     correctIndex: 0,
   ),
   QuizQuestion(
     question: 'O başı ağrıdığında en iyi gelen şey nedir?',
     options: [
       'Karanlık Odada Uyumak 🛌',
-      'Elifimin dizine yatmak 💆‍♂️',
+      'Elifinin bacağına yatmak 💆‍♂️',
       'Soğuk Kompleks 🧊',
       'Ağrı Kesici Hap 💊',
     ],
@@ -388,7 +341,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
     options: [
       'Pencereden Kahve İçerek İzlemek ☕',
       'Evde Film Açıp İzlemek 🍿',
-      'Elifimle aynı şemsiyeyi paylaşmayı ☂️',
+      'Elifiyle aynı şemsiyeyi paylaşmayı ☂️',
       'Sıcak Çorba İçmek 🥣',
     ],
     correctIndex: 2,
@@ -396,7 +349,7 @@ final List<QuizQuestion> customQuizQuestions = List.unmodifiable([
   QuizQuestion(
     question: 'O geleceğe dair en büyük hedefini ne olarak görür?',
     options: [
-      'Elifimle bir geleceği 💍',
+      'Elifiyle bir geleceği 💍',
       'Çok Zengin Olmak 💵',
       'Dünya Turuna Çıkmak 🌍',
       'Kendi Şirketini Kurmak 🏢',

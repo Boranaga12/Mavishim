@@ -75,6 +75,12 @@ class FakeAppRepository implements AppRepository {
     snapshot = _copy(tapHearts: hearts);
   }
 
+  @override
+  Future<void> saveGameProgress(Map<String, int> progress) async {
+    _checkFailure();
+    snapshot = _copy(gameProgress: progress);
+  }
+
   void _checkFailure() {
     if (shouldFail) {
       throw const AppStorageException('fake operation', 'forced failure');
@@ -93,6 +99,7 @@ class FakeAppRepository implements AppRepository {
     List<WheelModel>? wheels,
     List<QuizQuestion>? quizQuestions,
     List<TapHeart>? tapHearts,
+    Map<String, int>? gameProgress,
   }) => AppDataSnapshot(
     periodHistory: periodHistory ?? snapshot.periodHistory,
     cycleLength: cycleLength ?? snapshot.cycleLength,
@@ -105,6 +112,7 @@ class FakeAppRepository implements AppRepository {
     wheels: wheels ?? snapshot.wheels,
     quizQuestions: quizQuestions ?? snapshot.quizQuestions,
     tapHearts: tapHearts ?? snapshot.tapHearts,
+    gameProgress: gameProgress ?? snapshot.gameProgress,
   );
 }
 

@@ -17,12 +17,12 @@ class TapEffectsProvider with ChangeNotifier {
         _hearts.where((heart) => heart.surfaceId == surfaceId),
       );
 
-  Future<void> toggleHeart(String surfaceId, double x, double y) async {
+  Future<void> toggleHeart(String surfaceId, double x, double contentY) async {
     final existingIndex = _hearts.indexWhere(
       (heart) =>
           heart.surfaceId == surfaceId &&
           (heart.x - x).abs() < 0.045 &&
-          (heart.y - y).abs() < 0.055,
+          (heart.contentY - contentY).abs() < 34,
     );
     final previous = List<TapHeart>.of(_hearts);
     if (existingIndex >= 0) {
@@ -33,7 +33,7 @@ class TapEffectsProvider with ChangeNotifier {
           id: DateTime.now().microsecondsSinceEpoch.toString(),
           surfaceId: surfaceId,
           x: x.clamp(0.0, 1.0).toDouble(),
-          y: y.clamp(0.0, 1.0).toDouble(),
+          contentY: contentY.clamp(0.0, double.infinity).toDouble(),
         ),
       );
     }

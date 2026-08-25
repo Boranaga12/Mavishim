@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../providers/game_provider.dart';
 
 class MinesweeperGameView extends StatefulWidget {
   const MinesweeperGameView({super.key});
@@ -17,10 +20,12 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
   bool _flagMode = false;
   bool _gameOver = false;
   bool _won = false;
+  int _wins = 0;
 
   @override
   void initState() {
     super.initState();
+    _wins = context.read<GameProvider>().progressFor('minesweeper');
     _newGame();
   }
 
@@ -82,6 +87,10 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
           .where((item) => !item.isMine)
           .every((item) => item.isRevealed);
       _gameOver = _won;
+      if (_won) {
+        _wins++;
+        context.read<GameProvider>().saveProgress('minesweeper', _wins);
+      }
     });
   }
 
@@ -118,7 +127,7 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Mayın: $_mineCount'),
+                  Text('Mayın: $_mineCount • Galibiyet: $_wins'),
                   FilledButton.tonalIcon(
                     onPressed: () => setState(() => _flagMode = !_flagMode),
                     icon: Icon(_flagMode ? Icons.flag : Icons.flag_outlined),

@@ -13,11 +13,9 @@ class SecurityLockScreen extends StatefulWidget {
 class _SecurityLockScreenState extends State<SecurityLockScreen>
     with WidgetsBindingObserver {
   bool _isUnlocked = false;
-
   int _rightCount = 0;
   int _leftCount = 0;
-  int _phase =
-      0; // 0: accumulating Rights, 1: got >=2 Rights, accumulating Lefts
+  int _phase = 0;
 
   @override
   void initState() {
@@ -33,55 +31,34 @@ class _SecurityLockScreenState extends State<SecurityLockScreen>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed || !_isUnlocked) return;
-    // Bottom sheets, dialogs and pushed game pages live above this widget's
-    // route. Close them before presenting the privacy screen so no panel can
-    // remain visible over the lock after the app returns to foreground.
-    Navigator.maybeOf(
-      context,
-      rootNavigator: true,
-    )?.popUntil((route) => route.isFirst);
+    if (state == AppLifecycleState.resumed || !_isUnlocked || !mounted) return;
     setState(_lock);
   }
 
-  void _handleTap(TapDownDetails details, double screenWidth) {
-    if (_isUnlocked) return;
-    _handleSide(details.localPosition.dx >= (screenWidth / 2));
+  void _handleTap(TapDownDetails details, double width) {
+    if (!_isUnlocked) _handleSide(details.localPosition.dx >= width / 2);
   }
 
-  void _handleSide(bool isRightSide) {
+  void _handleSide(bool right) {
     if (_isUnlocked) return;
-
-    if (isRightSide) {
-      // User tapped RIGHT side
+    if (right) {
       if (_phase == 0) {
         _rightCount++;
-        if (_rightCount >= 2) {
-          _phase = 1;
-        }
-      } else if (_phase == 1) {
-        if (_leftCount == 0) {
-          // Still accumulating extra Right taps (e.g., 3rd, 4th, 5th Right tap)
-          _rightCount++;
-        } else if (_leftCount >= 2) {
-          // Final Right tap after at least 2 Lefts -> UNLOCK!
-          setState(() {
-            _isUnlocked = true;
-          });
-        } else {
-          // Tapped Right too early (only 1 Left tapped) -> Reset
-          _resetLock(startWithRight: true);
-        }
+        if (_rightCount >= 2) _phase = 1;
+      } else if (_leftCount == 0) {
+        _rightCount++;
+      } else if (_leftCount >= 2) {
+        setState(() {
+          _isUnlocked = true;
+          _resetLock();
+        });
+      } else {
+        _resetLock(startWithRight: true);
       }
+    } else if (_phase == 1 && _rightCount >= 2) {
+      _leftCount++;
     } else {
-      // User tapped LEFT side
-      if (_phase == 0 || _rightCount < 2) {
-        // Tapped Left before getting at least 2 Rights -> Reset
-        _resetLock();
-      } else if (_phase == 1) {
-        // Accumulating Left taps after >=2 Rights
-        _leftCount++;
-      }
+      _resetLock();
     }
   }
 
@@ -111,33 +88,42 @@ class _SecurityLockScreenState extends State<SecurityLockScreen>
 
   @override
   Widget build(BuildContext context) {
-    if (_isUnlocked) {
-      return widget.child;
-    }
-
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          return Semantics(
-            label: 'Gizli kilit ekranı',
-            hint: 'Tanımlı dokunma veya yön tuşu dizisini girin.',
-            child: Focus(
-              autofocus: true,
-              onKeyEvent: _handleKeyEvent,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapDown: (details) =>
-                    _handleTap(details, constraints.maxWidth),
-                child: const ColoredBox(
-                  color: Colors.black,
-                  child: SizedBox.expand(),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        // Keep the navigator laid out behind the opaque lock so unlocking does
+        // not trigger an expensive full-tree layout. Input, semantics and
+        // tickers remain disabled while the black lock is visible.
+        IgnorePointer(
+          ignoring: !_isUnlocked,
+          child: ExcludeSemantics(
+            excluding: !_isUnlocked,
+            child: TickerMode(enabled: _isUnlocked, child: widget.child),
+          ),
+        ),
+        if (!_isUnlocked)
+          Positioned.fill(
+            child: ColoredBox(
+              color: Colors.black,
+              child: LayoutBuilder(
+                builder: (context, constraints) => Semantics(
+                  label: 'Gizli kilit ekranı',
+                  hint: 'Tanımlı dokunma veya yön tuşu dizisini girin.',
+                  child: Focus(
+                    autofocus: true,
+                    onKeyEvent: _handleKeyEvent,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTapDown: (details) =>
+                          _handleTap(details, constraints.maxWidth),
+                      child: const SizedBox.expand(),
+                    ),
+                  ),
                 ),
               ),
             ),
-          );
-        },
-      ),
+          ),
+      ],
     );
   }
 }

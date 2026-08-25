@@ -15,6 +15,7 @@ class AppDataSnapshot {
   final List<WheelModel> wheels;
   final List<QuizQuestion> quizQuestions;
   final List<TapHeart> tapHearts;
+  final Map<String, int> gameProgress;
 
   AppDataSnapshot({
     required List<DateTime> periodHistory,
@@ -28,11 +29,13 @@ class AppDataSnapshot {
     required List<WheelModel> wheels,
     required List<QuizQuestion> quizQuestions,
     required List<TapHeart> tapHearts,
+    Map<String, int> gameProgress = const {},
   }) : periodHistory = List.unmodifiable(periodHistory),
        dailyLogs = Map.unmodifiable(dailyLogs),
        wheels = List.unmodifiable(wheels),
        quizQuestions = List.unmodifiable(quizQuestions),
-       tapHearts = List.unmodifiable(tapHearts);
+       tapHearts = List.unmodifiable(tapHearts),
+       gameProgress = Map.unmodifiable(gameProgress);
 }
 
 abstract interface class AppRepository {
@@ -60,6 +63,8 @@ abstract interface class AppRepository {
   Future<void> clearAllData();
 
   Future<void> saveTapHearts(List<TapHeart> hearts);
+
+  Future<void> saveGameProgress(Map<String, int> progress);
 }
 
 class AppStorageException implements Exception {

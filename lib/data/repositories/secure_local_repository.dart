@@ -88,6 +88,15 @@ class SecureLocalRepository implements AppRepository {
           .map(TapHeart.fromMap)
           .where((heart) => heart.id.isNotEmpty)
           .toList();
+      final gameProgress = <String, int>{};
+      final storedProgress = _settings.get('gameProgress');
+      if (storedProgress is Map) {
+        for (final entry in storedProgress.entries) {
+          if (entry.value is num) {
+            gameProgress[entry.key.toString()] = (entry.value as num).toInt();
+          }
+        }
+      }
 
       return AppDataSnapshot(
         periodHistory: periodHistory,
@@ -108,6 +117,7 @@ class SecureLocalRepository implements AppRepository {
         // Quiz content is source-controlled; saved edits cannot override it.
         quizQuestions: customQuizQuestions,
         tapHearts: tapHearts,
+        gameProgress: gameProgress,
       );
     } catch (error) {
       throw AppStorageException('load', error);
@@ -201,6 +211,15 @@ class SecureLocalRepository implements AppRepository {
       );
     } catch (error) {
       throw AppStorageException('save tap hearts', error);
+    }
+  }
+
+  @override
+  Future<void> saveGameProgress(Map<String, int> progress) async {
+    try {
+      await _settings.put('gameProgress', Map<String, int>.from(progress));
+    } catch (error) {
+      throw AppStorageException('save game progress', error);
     }
   }
 

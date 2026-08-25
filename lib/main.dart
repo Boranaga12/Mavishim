@@ -137,15 +137,13 @@ class MavishimApp extends StatelessWidget {
                 maxScaleFactor: 1.6,
               ),
             ),
-            child: child!,
+            child: MobileFrameWrapper(child: SecurityLockScreen(child: child!)),
           );
         },
         localizationsDelegates: AppLocalizations.localizationsDelegates,
         supportedLocales: AppLocalizations.supportedLocales,
         locale: const Locale('tr'),
-        home: const MobileFrameWrapper(
-          child: SecurityLockScreen(child: MainNavigationView()),
-        ),
+        home: const MainNavigationView(),
       ),
     );
   }

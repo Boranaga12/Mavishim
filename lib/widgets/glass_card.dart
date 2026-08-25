@@ -22,6 +22,11 @@ class GlassCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(borderRadius),
+      side: BorderSide(
+        color: Theme.of(
+          context,
+        ).colorScheme.outlineVariant.withValues(alpha: 0.32),
+      ),
     );
     Widget card = Container(
       margin: margin,
@@ -29,10 +34,10 @@ class GlassCard extends StatelessWidget {
         color:
             color ??
             Theme.of(context).colorScheme.surface.withValues(alpha: 0.94),
-        elevation: 1,
-        shadowColor: Colors.black26,
+        elevation: 0,
         shape: shape,
-        clipBehavior: Clip.antiAlias,
+        // Avoid an offscreen anti-alias layer for every card in long lists.
+        clipBehavior: Clip.none,
         child: InkWell(
           onTap: onTap,
           customBorder: shape,

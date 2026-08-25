@@ -37,7 +37,7 @@ class _MemoryGameViewState extends State<MemoryGameView> {
   void initState() {
     super.initState();
     _confettiController = ConfettiController(
-      duration: const Duration(seconds: 3),
+      duration: const Duration(milliseconds: 1200),
     );
     _startNewGame(notify: false);
   }
@@ -264,6 +264,10 @@ class _MemoryGameViewState extends State<MemoryGameView> {
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
               shouldLoop: false,
+              numberOfParticles: 10,
+              emissionFrequency: 0.025,
+              maxBlastForce: 12,
+              minBlastForce: 5,
               colors: const [
                 Colors.pink,
                 Colors.red,

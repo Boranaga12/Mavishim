@@ -163,6 +163,8 @@ class _Header extends StatelessWidget {
             'assets/branding/mavishim_icon.png',
             width: 48,
             height: 48,
+            cacheWidth: 144,
+            cacheHeight: 144,
             fit: BoxFit.cover,
             semanticLabel: 'Mavishim logosu',
           ),
