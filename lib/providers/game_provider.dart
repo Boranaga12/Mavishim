@@ -3,6 +3,7 @@ import 'dart:collection';
 
 import 'package:flutter/foundation.dart';
 
+import '../core/audio/app_audio.dart';
 import '../data/repositories/app_repository.dart';
 import '../data/default_wheels.dart';
 import '../data/quiz_questions.dart';
@@ -31,6 +32,7 @@ class GameProvider with ChangeNotifier {
         .toInt();
     _quizQuestions = List.of(snapshot.quizQuestions);
     _gameProgress = Map.of(snapshot.gameProgress);
+    unawaited(AppAudio.instance.setVolume(soundVolume));
   }
 
   int get memoryBestScore => _memoryBestScore;
@@ -41,6 +43,13 @@ class GameProvider with ChangeNotifier {
       UnmodifiableListView(_quizQuestions);
   String? get errorMessage => _errorMessage;
   int progressFor(String gameId) => _gameProgress[gameId] ?? 0;
+  bool get darkMode => progressFor('app_dark_mode') == 1;
+  int get soundVolumePercent {
+    final stored = _gameProgress['app_sound_volume'];
+    return (stored ?? 80).clamp(0, 100).toInt();
+  }
+
+  double get soundVolume => soundVolumePercent / 100;
   int get quizCursor => progressFor('quizCursor');
 
   WheelModel get activeWheel => _wheels[_activeWheelIndex];
@@ -106,6 +115,15 @@ class GameProvider with ChangeNotifier {
       const Duration(milliseconds: 220),
       () => unawaited(_flushGameProgress()),
     );
+  }
+
+  Future<void> toggleDarkMode() =>
+      saveProgress('app_dark_mode', darkMode ? 0 : 1);
+
+  Future<void> setSoundVolume(double value) async {
+    final percent = (value.clamp(0, 1) * 100).round();
+    await AppAudio.instance.setVolume(percent / 100);
+    await saveProgress('app_sound_volume', percent);
   }
 
   Future<void> _flushGameProgress() async {

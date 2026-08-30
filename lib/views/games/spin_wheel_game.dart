@@ -24,6 +24,7 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
   double _currentAngle = 0;
   String? _selectedResult;
   bool _isSpinning = false;
+  bool get _nightMode => Theme.of(context).brightness == Brightness.dark;
   final Random _random = Random();
 
   @override
@@ -87,6 +88,8 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
 
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: _nightMode ? const Color(0xFF101725) : null,
+        foregroundColor: _nightMode ? Colors.white : null,
         title: const Text(
           'Karar & Plan Çarkıfeleği 🎡',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
@@ -97,13 +100,15 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
             tooltip: 'Çark Seçeneklerini Yönet',
             onPressed: () => _openWheelManager(context, gameProvider),
           ),
+          const SizedBox(width: 52),
         ],
       ),
       body: Stack(
         children: [
           Container(
-            decoration: const BoxDecoration(
-              gradient: AppTheme.backgroundGradient,
+            decoration: BoxDecoration(
+              gradient: _nightMode ? null : AppTheme.backgroundGradient,
+              color: _nightMode ? const Color(0xFF101725) : null,
             ),
             child: SafeArea(
               child: Padding(
@@ -149,7 +154,7 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
                               labelStyle: TextStyle(
                                 color: isSelected
                                     ? Colors.white
-                                    : Colors.black87,
+                                    : Theme.of(context).colorScheme.onSurface,
                                 fontWeight: isSelected
                                     ? FontWeight.bold
                                     : FontWeight.normal,
@@ -223,11 +228,13 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
                         margin: const EdgeInsets.only(bottom: 10),
                         child: Column(
                           children: [
-                            const Text(
+                            Text(
                               '🎉 Bugünün Kararı:',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.black54,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                             ),
                             const SizedBox(height: 2),

@@ -3,9 +3,280 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
 
 import '../../core/theme/app_theme.dart';
 import '../../providers/game_provider.dart';
+
+const _differencePairs = <(String, String)>[
+  ('●', '◆'),
+  ('▲', '▼'),
+  ('★', '☆'),
+  ('♥', '♦'),
+  ('○', '◉'),
+  ('■', '□'),
+  ('🌸', '🌺'),
+  ('🌙', '⭐'),
+  ('🍓', '🍒'),
+  ('🐱', '🐶'),
+  ('🦋', '🐝'),
+  ('🍀', '🌿'),
+  ('😊', '😉'),
+  ('🥰', '😍'),
+  ('💗', '💖'),
+  ('☁️', '🌧️'),
+  ('🍬', '🍭'),
+  ('🎈', '🎀'),
+  ('🐚', '🪸'),
+  ('🌻', '🌼'),
+  ('🧁', '🍰'),
+  ('🐼', '🐨'),
+  ('🫐', '🍇'),
+  ('🎵', '🎶'),
+  ('🔵', '🟣'),
+  ('🔶', '🔷'),
+  ('➕', '✖️'),
+  ('☀️', '🌤️'),
+  ('🪻', '🌷'),
+  ('🐰', '🐹'),
+  ('🍉', '🍈'),
+  ('🌍', '🌎'),
+  ('🕐', '🕑'),
+  ('👑', '💎'),
+  ('🧸', '🎁'),
+  ('🚗', '🚕'),
+];
+
+const _loveSentences = <String>[
+  'Boran Elifini her geçen gün daha çok seviyor ve Elifiyle kurduğu bütün güzel hayalleri ömrü boyunca kalbinde taşımak istiyor',
+  'Boranın dünyası Elifi yanında olduğunda daha huzurlu daha renkli ve çok daha anlamlı bir yere dönüşüyor',
+  'Elifin gülüşü Boranın en karanlık gününü aydınlatıyor sesi içini sakinleştiriyor ve sevgisi ona umut veriyor',
+  'Boran için Elifiyle geçirdiği küçücük bir an bile Elifsiz geçen koskoca bir günden çok daha değerli geliyor',
+  'Boranın kalbinin en güzel köşesi yalnızca Elifine ait çünkü Elifi onun sevgilisi sırdaşı mutluluğu ve bir tanesi',
+  'Boran Elifinin elini tuttuğu her an bütün yolların sonunda yine Elifine varmak ve onunla yaşlanmak istiyor',
+];
+
+const _reactionPhrases = <String>[
+  'Vay be, onu sonsuz çok seviyorsun!',
+  'Kalbin Boran demek için ışık hızını geçti!',
+  'Bu hız gerçek aşkın kesin kanıtı!',
+  'Boran kalbinin tam merkezinde yaşıyor!',
+  'Hımm, evet seviyorsun gibi görünüyor!',
+  'Gayet hızlıydın, sevgin güçlü!',
+  'Kalbin hiç düşünmeden EVET dedi!',
+  'Boran bunu görse kesinlikle çok mutlu olurdu!',
+  'Sevgi radarında oldukça yüksek çıktın!',
+  'Biraz düşündün ama kalbin doğru cevabı verdi!',
+  'Fena değil, Boran sevgisi hâlâ sıcak!',
+  'Galiba naz yapıyorsun ama sevdiğin belli!',
+  'Biraz daha hızlı olabilirdin sevgilim!',
+  'Kalbinle beynin kısa bir toplantı yaptı galiba!',
+  'Boran cevabını beklerken biraz heyecanlandı!',
+  'Hiç de seviyor gibi değilsin, çok beklettin!',
+  'Bu kadar düşünmek de ne, cevap zaten Boran!',
+  'Geç bastın, demek ki sevgini biraz sorguladın!',
+  'Boran beklemekten neredeyse umudunu kesecekti!',
+  'Çok geç bastın; hemen bir sevgi sarılması borçlusun!',
+];
+
+class _WordLevel {
+  final String letters;
+  final List<String> words;
+  const _WordLevel(this.letters, this.words);
+
+  List<String> get allWords {
+    final result = <String>{...words};
+    for (final candidate in _wordCandidates) {
+      if (_canBuildWord(letters, candidate)) result.add(candidate);
+    }
+    final sorted = result.toList();
+    sorted.sort((a, b) {
+      final lengthOrder = b.length.compareTo(a.length);
+      return lengthOrder != 0 ? lengthOrder : a.compareTo(b);
+    });
+    return sorted;
+  }
+}
+
+String _turkishLower(String value) =>
+    value.replaceAll('I', 'ı').replaceAll('İ', 'i').toLowerCase();
+
+bool _canBuildWord(String source, String word) {
+  final available = <String, int>{};
+  for (final letter in _turkishLower(source).split('')) {
+    available[letter] = (available[letter] ?? 0) + 1;
+  }
+  for (final letter in _turkishLower(word).split('')) {
+    final remaining = available[letter] ?? 0;
+    if (remaining == 0) return false;
+    available[letter] = remaining - 1;
+  }
+  return word.length >= 2;
+}
+
+const _wordCandidates = <String>[
+  'ad',
+  'ak',
+  'al',
+  'an',
+  'ar',
+  'as',
+  'at',
+  'ay',
+  'az',
+  'bal',
+  'bar',
+  'baş',
+  'ben',
+  'bir',
+  'biz',
+  'bol',
+  'bor',
+  'boy',
+  'bu',
+  'can',
+  'cam',
+  'cici',
+  'çiçek',
+  'da',
+  'dal',
+  'dem',
+  'dil',
+  'diz',
+  'dün',
+  'el',
+  'elim',
+  'em',
+  'en',
+  'eş',
+  'eşim',
+  'et',
+  'fal',
+  'fil',
+  'gül',
+  'gün',
+  'güneş',
+  'hat',
+  'hayat',
+  'iç',
+  'içim',
+  'il',
+  'ilim',
+  'isim',
+  'iz',
+  'kal',
+  'kalp',
+  'kan',
+  'kar',
+  'kat',
+  'kuş',
+  'mal',
+  'masal',
+  'mat',
+  'mel',
+  'mert',
+  'mum',
+  'muş',
+  'nar',
+  'naz',
+  'nefes',
+  'net',
+  'not',
+  'ol',
+  'on',
+  'oran',
+  'oy',
+  'ömür',
+  'pat',
+  'pati',
+  'patates',
+  'pet',
+  'rahat',
+  'ruh',
+  'saç',
+  'sal',
+  'sen',
+  'ses',
+  'sev',
+  'sevgi',
+  'simit',
+  'su',
+  'şan',
+  'tam',
+  'tan',
+  'tane',
+  'taş',
+  'tat',
+  'tema',
+  'tepe',
+  'ten',
+  'ter',
+  'uç',
+  'umut',
+  'un',
+  'var',
+  'yar',
+  'yavru',
+  'yaz',
+  'yıldız',
+  'yol',
+  'anım',
+  'alım',
+  'akım',
+  'cicim',
+  'gülüm',
+  'kuşum',
+  'ruhum',
+  'yavrum',
+  'balım',
+  'canım',
+  'aşk',
+  'aşkım',
+  'elifim',
+  'boranım',
+  'ömrüm',
+  'gubuş',
+  'gubuşum',
+  'birtanem',
+  'hayatım',
+  'peteğim',
+  'pofuduğum',
+  'patatesim',
+  'çiçeğim',
+  'böceğim',
+  'meleğim',
+  'güneşim',
+  'yıldızım',
+  'nefesim',
+  'sevgilim',
+];
+
+const _wordLevels = <_WordLevel>[
+  _WordLevel('BORANIM', ['boranım', 'anım', 'oran']),
+  _WordLevel('ELİFİM', ['elifim', 'ilim', 'fil']),
+  _WordLevel('GUBUŞUM', ['gubuşum', 'gubuş', 'muş']),
+  _WordLevel('CANIM', ['canım', 'anım', 'can']),
+  _WordLevel('CİCİM', ['cicim', 'cici']),
+  _WordLevel('SEVGİLİM', ['sevgilim', 'sevgi', 'ilgi']),
+  _WordLevel('AŞKIM', ['aşkım', 'aşk', 'akım']),
+  _WordLevel('ÖMRÜM', ['ömrüm', 'ömür']),
+  _WordLevel('BİRTANEM', ['birtanem', 'bir', 'tane']),
+  _WordLevel('HAYATIM', ['hayatım', 'hayat', 'hat']),
+  _WordLevel('BALIM', ['balım', 'bal', 'alım']),
+  _WordLevel('PETEĞİM', ['peteğim', 'tepe']),
+  _WordLevel('POFUDUĞUM', ['pofuduğum']),
+  _WordLevel('PATATESİM', ['patatesim', 'patates', 'pati']),
+  _WordLevel('ÇİÇEĞİM', ['çiçeğim', 'çiçek', 'içim']),
+  _WordLevel('BÖCEĞİM', ['böceğim']),
+  _WordLevel('KUŞUM', ['kuşum', 'kuş']),
+  _WordLevel('GÜLÜM', ['gülüm', 'gül']),
+  _WordLevel('YAVRUM', ['yavrum', 'yavru']),
+  _WordLevel('RUHUM', ['ruhum', 'ruh']),
+  _WordLevel('MELEĞİM', ['meleğim']),
+  _WordLevel('GÜNEŞİM', ['güneşim', 'güneş', 'eşim']),
+  _WordLevel('YILDIZIM', ['yıldızım', 'yıldız']),
+  _WordLevel('NEFESİM', ['nefesim', 'nefes']),
+];
 
 enum CuteArcadeGame {
   patternMemory,
@@ -14,14 +285,9 @@ enum CuteArcadeGame {
   maze,
   slidingPuzzle,
   wordHunt,
-  numberMerge,
   reaction,
-  balloonMatch,
   miniSudoku,
-  drawPath,
   targetShot,
-  emojiPuzzle,
-  rhythm,
 }
 
 extension CuteArcadeGameInfo on CuteArcadeGame {
@@ -32,35 +298,24 @@ extension CuteArcadeGameInfo on CuteArcadeGame {
     CuteArcadeGame.maze => 'Pembe Labirent',
     CuteArcadeGame.slidingPuzzle => 'Kaydırmalı Yapboz',
     CuteArcadeGame.wordHunt => 'Kelime Avı',
-    CuteArcadeGame.numberMerge => 'Sayı Birleştirme',
     CuteArcadeGame.reaction => 'Tepki Testi',
-    CuteArcadeGame.balloonMatch => 'Balon Eşleştirme',
     CuteArcadeGame.miniSudoku => 'Mini Sudoku',
-    CuteArcadeGame.drawPath => 'Yol Çiz',
     CuteArcadeGame.targetShot => 'Hedefe Atış',
-    CuteArcadeGame.emojiPuzzle => 'Emoji Bulmaca',
-    CuteArcadeGame.rhythm => 'Ritmi Yakala',
   };
 
   String get description => switch (this) {
     CuteArcadeGame.patternMemory => 'Parlayan kutuların sırasını tekrarla.',
     CuteArcadeGame.spotDifference => 'Kalabalığın içindeki farklı şekli bul.',
-    CuteArcadeGame.quickTap => 'Hareket eden hedefi süre dolmadan yakala.',
-    CuteArcadeGame.maze => 'Pembe noktayı engellere değmeden çıkışa götür.',
+    CuteArcadeGame.quickTap =>
+      'Sevgi cümlesini süre dolmadan kelime kelime tamamla.',
+    CuteArcadeGame.maze => 'Elif’i süre dolmadan Boran’a ulaştır.',
     CuteArcadeGame.slidingPuzzle =>
       'Sekiz parçayı kaydırıp doğru sıraya getir.',
     CuteArcadeGame.wordHunt => 'Karışık harflerden doğru kelimeyi oluştur.',
-    CuteArcadeGame.numberMerge =>
-      'Aynı sayıları seçip daha büyük sayıya birleştir.',
     CuteArcadeGame.reaction =>
-      'Ekran yeşil olduğunda olabildiğince hızlı dokun.',
-    CuteArcadeGame.balloonMatch => 'Aynı renkteki balon çiftlerini eşleştir.',
-    CuteArcadeGame.miniSudoku => '4×4 tabloyu 1–4 sayılarıyla tamamla.',
-    CuteArcadeGame.drawPath => 'Noktaları sırayla birleştirerek yolu tamamla.',
-    CuteArcadeGame.targetShot => 'Nişangâhı hedefe getirip atış yap.',
-    CuteArcadeGame.emojiPuzzle =>
-      'Benzer emojiler arasındaki farklı olanı bul.',
-    CuteArcadeGame.rhythm => 'Yanan renklerin ritmini aynı sırayla tekrarla.',
+      'Yeşil EVET’i yakala ve sevgini yüzdeyle göster.',
+    CuteArcadeGame.miniSudoku => '4×4 E, L, İ, F tablosunu tamamla.',
+    CuteArcadeGame.targetShot => 'Konum, açı ve güçle sevgini Boran’a ulaştır.',
   };
 
   IconData get icon => switch (this) {
@@ -70,14 +325,9 @@ extension CuteArcadeGameInfo on CuteArcadeGame {
     CuteArcadeGame.maze => Icons.route_rounded,
     CuteArcadeGame.slidingPuzzle => Icons.extension_rounded,
     CuteArcadeGame.wordHunt => Icons.spellcheck_rounded,
-    CuteArcadeGame.numberMerge => Icons.add_box_rounded,
     CuteArcadeGame.reaction => Icons.bolt_rounded,
-    CuteArcadeGame.balloonMatch => Icons.bubble_chart_rounded,
     CuteArcadeGame.miniSudoku => Icons.grid_4x4_rounded,
-    CuteArcadeGame.drawPath => Icons.gesture_rounded,
     CuteArcadeGame.targetShot => Icons.gps_fixed_rounded,
-    CuteArcadeGame.emojiPuzzle => Icons.emoji_emotions_rounded,
-    CuteArcadeGame.rhythm => Icons.music_note_rounded,
   };
 }
 
@@ -91,17 +341,43 @@ class CuteArcadeGameView extends StatefulWidget {
 }
 
 class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
-    with WidgetsBindingObserver {
+    with WidgetsBindingObserver, TickerProviderStateMixin {
   final _random = Random();
-  final _wordController = TextEditingController();
   Timer? _timer;
   int _score = 0;
+  int _best = 0;
+  int _lives = 3;
+  bool get _nightMode => Theme.of(context).brightness == Brightness.dark;
+  bool _ended = false;
+  bool _showingResult = false;
+  bool _hasPlayed = false;
+  bool _recordCelebrated = false;
+  int _roundTotalSeconds = 20;
+  final Map<int, String> _quickTargets = {};
+  List<String> _quickWords = [];
+  int _quickWordIndex = 0;
+  final Stopwatch _stopwatch = Stopwatch();
+  DateTime? _reactionStarted;
+  late ConfettiController _confetti;
+  late AnimationController _aimMotion;
+  late AnimationController _powerMotion;
+  late AnimationController _angleMotion;
+  late AnimationController _launchMotion;
+  int _shotStage = 0;
+  double _power = .5;
+  double _angle = 0;
+  double _targetY = .18;
+  Offset _shotEnd = const Offset(.5, .2);
   int _target = 0;
+  int _differenceStyle = 0;
   int _seconds = 20;
   int _position = 0;
+  int _mazeSide = 5;
+  Set<(int, int)> _mazePassages = {};
+  Set<int> _mazeExits = {};
+  bool _mazeReuniting = false;
   int _activeTile = -1;
   int _step = 0;
-  int? _firstChoice;
   double _aim = 0.5;
   double _targetAim = 0.5;
   bool _ready = false;
@@ -109,16 +385,62 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
   String _message = '';
   late List<int> _board;
   List<int> _sequence = [];
-  final Set<int> _revealed = {};
-  final Set<int> _matched = {};
+  final List<int> _wordSelected = [];
+  final Set<String> _foundWords = {};
+  List<String> _wordLetters = [];
+  Offset? _wordPointer;
+  String _reactionButtonText = 'Boranını seviyor musun?';
+  String _reactionFeedback = '';
 
   String get _progressKey => 'arcade_${widget.game.name}';
+  bool get _isTimedGame => const {
+    CuteArcadeGame.spotDifference,
+    CuteArcadeGame.quickTap,
+    CuteArcadeGame.maze,
+  }.contains(widget.game);
+  Color? get _timeDangerColor {
+    if (!_isTimedGame || _seconds > 6) return null;
+    final danger = (1 - _seconds / 7).clamp(0.0, 1.0);
+    return Color.lerp(const Color(0xFFFFEEF5), const Color(0xFFFF8A8A), danger);
+  }
+
+  String get _appScoreText => switch (widget.game) {
+    CuteArcadeGame.targetShot ||
+    CuteArcadeGame.reaction => 'Sevgi %$_score • Maksimum %$_best',
+    CuteArcadeGame.slidingPuzzle || CuteArcadeGame.miniSudoku =>
+      'Rekor ${_best == 0 ? '-' : '${(_best / 1000).toStringAsFixed(1)} sn'}',
+    _ => 'Skor $_score • Maksimum $_best',
+  };
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _score = context.read<GameProvider>().progressFor(_progressKey);
+    _best = context.read<GameProvider>().progressFor(_progressKey);
+    if ((widget.game == CuteArcadeGame.reaction ||
+            widget.game == CuteArcadeGame.targetShot) &&
+        _best > 100) {
+      _best = 0;
+      context.read<GameProvider>().saveProgress(_progressKey, 0);
+    }
+    _confetti = ConfettiController(duration: const Duration(milliseconds: 900));
+    _aimMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 420),
+    )..repeat(reverse: true);
+    _powerMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+    _angleMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+    _launchMotion = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _stopwatch.start();
     _resetRound();
   }
 
@@ -126,7 +448,12 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _timer?.cancel();
-    _wordController.dispose();
+    _stopwatch.stop();
+    _confetti.dispose();
+    _aimMotion.dispose();
+    _powerMotion.dispose();
+    _angleMotion.dispose();
+    _launchMotion.dispose();
     super.dispose();
   }
 
@@ -136,7 +463,7 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
       _timer?.cancel();
       return;
     }
-    if (widget.game == CuteArcadeGame.quickTap && _seconds > 0) {
+    if (_isTimedGame && _seconds > 0) {
       _startCountdown();
     } else if (widget.game == CuteArcadeGame.reaction) {
       _scheduleReaction();
@@ -145,21 +472,33 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
 
   void _persistScore(int value) {
     _score = value;
-    context.read<GameProvider>().saveProgress(_progressKey, value);
+    if (value > _best) {
+      _best = value;
+      context.read<GameProvider>().saveProgress(_progressKey, value);
+      if (!_recordCelebrated) {
+        _recordCelebrated = true;
+        _confetti.play();
+      }
+    }
   }
 
   void _resetRound() {
     _timer?.cancel();
     _seconds = 20;
+    _lives = 3;
+    _ended = false;
     _position = 0;
     _step = 0;
-    _firstChoice = null;
     _activeTile = -1;
     _ready = false;
+    _shotStage = 0;
+    _aimMotion.repeat(reverse: true);
+    _powerMotion.stop();
+    _angleMotion.stop();
+    _launchMotion.reset();
+    _mazeReuniting = false;
     _inputEnabled = true;
     _message = '';
-    _revealed.clear();
-    _matched.clear();
     _board = List.generate(36, (index) => index);
     switch (widget.game) {
       case CuteArcadeGame.patternMemory:
@@ -169,14 +508,28 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
         );
         WidgetsBinding.instance.addPostFrameCallback((_) => _showSequence());
       case CuteArcadeGame.spotDifference:
-      case CuteArcadeGame.emojiPuzzle:
         _target = _random.nextInt(36);
+        _differenceStyle = _random.nextInt(_differencePairs.length);
+        _seconds = max(4, 12 - _score ~/ 2);
+        _roundTotalSeconds = _seconds;
+        _startCountdown();
       case CuteArcadeGame.quickTap:
-        _target = _random.nextInt(30);
+        _quickWords = (_loveSentences[_random.nextInt(_loveSentences.length)]
+            .split(' '));
+        _quickWordIndex = 0;
+        _quickTargets.clear();
+        _addQuickTarget();
+        _roundTotalSeconds = _seconds;
         _startCountdown();
       case CuteArcadeGame.maze:
-        _target = 24;
+        _makeMaze();
+        _seconds = max(9, 28 - _score * 2);
+        _roundTotalSeconds = _seconds;
+        _startCountdown();
       case CuteArcadeGame.slidingPuzzle:
+        _stopwatch
+          ..reset()
+          ..start();
         _board = List.generate(9, (index) => index);
         for (var i = 0; i < 120; i++) {
           final blank = _board.indexOf(0);
@@ -187,27 +540,21 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
           _board[blank] = value;
         }
       case CuteArcadeGame.wordHunt:
-        _target = _random.nextInt(_words.length);
-        _wordController.clear();
-      case CuteArcadeGame.numberMerge:
-        _board = List.generate(16, (_) => _random.nextBool() ? 2 : 4);
+        _target = _random.nextInt(_wordLevels.length);
+        _wordLetters = _wordLevels[_target].letters.split('')..shuffle(_random);
+        _wordSelected.clear();
+        _foundWords.clear();
       case CuteArcadeGame.reaction:
+        _reactionButtonText = 'Boranını seviyor musun?';
         _scheduleReaction();
-      case CuteArcadeGame.balloonMatch:
-        _board = [...List.generate(6, (i) => i), ...List.generate(6, (i) => i)]
-          ..shuffle(_random);
       case CuteArcadeGame.miniSudoku:
+        _stopwatch
+          ..reset()
+          ..start();
         _board = [1, 0, 3, 0, 0, 4, 0, 2, 2, 0, 4, 0, 0, 3, 0, 1];
-      case CuteArcadeGame.drawPath:
-        _sequence = [0, 1, 6, 7, 12, 13, 18, 19, 24];
       case CuteArcadeGame.targetShot:
         _targetAim = 0.12 + _random.nextDouble() * 0.76;
-      case CuteArcadeGame.rhythm:
-        _sequence = List.generate(
-          min(3 + _score, 10),
-          (_) => _random.nextInt(4),
-        );
-        WidgetsBinding.instance.addPostFrameCallback((_) => _showSequence());
+        _targetY = .1 + _random.nextDouble() * .35;
     }
   }
 
@@ -218,7 +565,13 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
         _seconds--;
         if (_seconds <= 0) {
           _timer?.cancel();
-          _message = 'Süre doldu • Puanın: $_score';
+          _message = widget.game == CuteArcadeGame.maze
+              ? 'Aşıklar kavuşamadı.'
+              : 'Süre doldu • Puanın: $_score';
+          _ended = true;
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _showResult(_message),
+          );
         }
       });
     });
@@ -241,9 +594,16 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
 
   void _sequenceTap(int index) {
     if (!_inputEnabled) return;
+    _hasPlayed = true;
     if (_sequence[_step] != index) {
+      _lives--;
+      if (_lives <= 0) {
+        _ended = true;
+        _showResult('Ulaştığın desen seviyesi: $_score');
+        return;
+      }
       setState(() {
-        _message = 'Sıra karıştı, yeniden gösteriliyor.';
+        _message = 'Yanlış sıra! $_lives canın kaldı.';
         _step = 0;
       });
       _showSequence();
@@ -259,6 +619,7 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
   }
 
   void _pickDifference(int index) {
+    _hasPlayed = true;
     if (index != _target) {
       setState(() => _message = 'Çok yakın, bir daha bak 🌸');
       return;
@@ -268,26 +629,77 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
   }
 
   void _quickTap(int index) {
-    if (_seconds <= 0 || index != _target) return;
+    if (_seconds <= 0 || !_quickTargets.containsKey(index)) return;
+    _hasPlayed = true;
     _persistScore(_score + 1);
-    setState(() => _target = _random.nextInt(30));
+    setState(() {
+      _quickTargets.remove(index);
+      _addQuickTarget();
+      if (_seconds < 10 && _quickTargets.length < 2) _addQuickTarget();
+    });
+  }
+
+  void _addQuickTarget() {
+    var next = _random.nextInt(30);
+    while (_quickTargets.containsKey(next)) {
+      next = _random.nextInt(30);
+    }
+    _quickTargets[next] = _quickWords[_quickWordIndex % _quickWords.length];
+    _quickWordIndex++;
   }
 
   void _move(int delta) {
-    const walls = {6, 7, 8, 13, 16, 18};
+    if (_mazeReuniting) return;
     final next = _position + delta;
-    final wraps =
-        (delta == 1 && _position % 5 == 4) ||
-        (delta == -1 && _position % 5 == 0);
-    if (next < 0 || next >= 25 || wraps || walls.contains(next)) return;
+    if (!_adjacent(_position, _mazeSide).contains(next) ||
+        !_mazePassages.contains(_edge(_position, next))) {
+      return;
+    }
+    _hasPlayed = true;
     setState(() => _position = next);
     context.read<GameProvider>().saveProgress('${_progressKey}_position', next);
-    if (next == _target) {
-      _persistScore(_score + 1);
+    if (_mazeExits.contains(next)) {
+      _timer?.cancel();
       setState(() {
-        _position = 0;
-        _message = 'Çıkışı buldun! ✨';
+        _mazeReuniting = true;
+        _message = 'Aşıklar kavuştu 💞';
       });
+      Future<void>.delayed(const Duration(milliseconds: 1800), () {
+        if (!mounted || _ended) return;
+        _persistScore(_score + 1);
+        setState(_resetRound);
+      });
+    }
+  }
+
+  (int, int) _edge(int a, int b) => a < b ? (a, b) : (b, a);
+
+  void _makeMaze() {
+    _mazeSide = min(11, 5 + (_score ~/ 2) * 2);
+    _position = 0;
+    final candidates = <int>{
+      for (var i = 1; i < _mazeSide; i++) i * _mazeSide + _mazeSide - 1,
+      for (var i = 1; i < _mazeSide; i++) (_mazeSide - 1) * _mazeSide + i,
+    }.toList()..shuffle(_random);
+    _mazeExits = {candidates.first};
+    _target = _mazeExits.first;
+    _mazePassages = {};
+    final visited = <int>{0};
+    final stack = <int>[0];
+    while (stack.isNotEmpty) {
+      final current = stack.last;
+      final choices = _adjacent(
+        current,
+        _mazeSide,
+      ).where((cell) => !visited.contains(cell)).toList();
+      if (choices.isEmpty) {
+        stack.removeLast();
+      } else {
+        final next = choices[_random.nextInt(choices.length)];
+        _mazePassages.add(_edge(current, next));
+        visited.add(next);
+        stack.add(next);
+      }
     }
   }
 
@@ -300,95 +712,116 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
 
   void _slide(int index) {
     final blank = _board.indexOf(0);
-    if (!_adjacent(blank, 3).contains(index)) return;
+    final sameRow = blank ~/ 3 == index ~/ 3;
+    final sameColumn = blank % 3 == index % 3;
+    if (!sameRow && !sameColumn) return;
+    final distance = sameRow
+        ? (blank - index).abs()
+        : (blank - index).abs() ~/ 3;
+    if (distance == 0 || distance > 2) return;
+    _hasPlayed = true;
+    final delta = sameRow ? (index > blank ? 1 : -1) : (index > blank ? 3 : -3);
     setState(() {
-      _board[blank] = _board[index];
+      var cursor = blank;
+      while (cursor != index) {
+        _board[cursor] = _board[cursor + delta];
+        cursor += delta;
+      }
       _board[index] = 0;
     });
     if (_board.join(',') == '1,2,3,4,5,6,7,8,0') {
-      _persistScore(_score + 1);
-      setState(() => _message = 'Yapboz tamamlandı! ✨');
+      _stopwatch.stop();
+      final elapsed = max(1, _stopwatch.elapsedMilliseconds);
+      _score = elapsed;
+      if (_best == 0 || elapsed < _best) {
+        _best = elapsed;
+        context.read<GameProvider>().saveProgress(_progressKey, elapsed);
+        _confetti.play();
+      }
+      _ended = true;
+      _showResult('Yapboz tamamlandı! ✨');
     }
   }
 
-  void _checkWord() {
-    final answer = _wordController.text.trim().toUpperCase();
-    if (answer == _words[_target]) {
-      _persistScore(_score + 1);
-      setState(_resetRound);
-    } else {
-      setState(() => _message = 'Bu olmadı, harflere tekrar bak.');
-    }
+  void _wordDragLetter(int index) {
+    if (_wordSelected.contains(index)) return;
+    _hasPlayed = true;
+    setState(() => _wordSelected.add(index));
   }
 
-  void _merge(int index) {
-    if (_firstChoice == null) {
-      setState(() => _firstChoice = index);
-      return;
-    }
-    final first = _firstChoice!;
-    if (first != index && _board[first] == _board[index]) {
-      setState(() {
-        _board[index] *= 2;
-        _board[first] = _random.nextBool() ? 2 : 4;
-        _firstChoice = null;
-      });
-      _persistScore(max(_score, _board[index]));
+  void _finishWordDrag(List<String> letters) {
+    if (_wordSelected.isEmpty) return;
+    final word = _wordSelected
+        .map((index) => letters[index])
+        .join()
+        .replaceAll('I', 'ı')
+        .replaceAll('İ', 'i')
+        .toLowerCase();
+    final level = _wordLevels[_target];
+    final words = level.allWords;
+    if (words.contains(word)) {
+      _foundWords.add(word);
+      _persistScore(_score + 1);
+      if (_foundWords.length == words.length) {
+        _ended = true;
+        _showResult('Bölüm tamamlandı!');
+      }
     } else {
-      setState(() => _firstChoice = index);
+      _message = '“$word” bu bölümde yok.';
     }
+    setState(() {
+      _wordSelected.clear();
+      _wordPointer = null;
+    });
   }
 
   void _scheduleReaction() {
     _ready = false;
-    _message = 'Bekle…';
-    _timer = Timer(Duration(milliseconds: 900 + _random.nextInt(2200)), () {
+    _reactionButtonText = 'Boranını seviyor musun?';
+    _reactionFeedback = '';
+    _message = '';
+    _timer?.cancel();
+    _timer = Timer(Duration(milliseconds: 2600 + _random.nextInt(3000)), () {
       if (mounted) {
         setState(() {
           _ready = true;
-          _message = 'ŞİMDİ!';
+          _reactionStarted = DateTime.now();
+          _reactionButtonText = 'EVET';
         });
       }
     });
   }
 
   void _reactionTap() {
+    _hasPlayed = true;
     if (!_ready) {
       _timer?.cancel();
-      setState(() => _message = 'Biraz erken dokundun.');
-      Future<void>.delayed(
-        const Duration(milliseconds: 700),
-        _scheduleReaction,
-      );
-      return;
-    }
-    _persistScore(_score + 1);
-    setState(_scheduleReaction);
-  }
-
-  void _matchBalloon(int index) {
-    if (_matched.contains(index) || _revealed.contains(index)) return;
-    setState(() => _revealed.add(index));
-    if (_firstChoice == null) {
-      _firstChoice = index;
-      return;
-    }
-    final first = _firstChoice!;
-    _firstChoice = null;
-    if (_board[first] == _board[index]) {
-      setState(() => _matched.addAll([first, index]));
-      _persistScore(_score + 1);
-      if (_matched.length == _board.length) setState(_resetRound);
-    } else {
-      Future<void>.delayed(const Duration(milliseconds: 650), () {
-        if (mounted) setState(() => _revealed.removeAll([first, index]));
+      setState(() {
+        _reactionButtonText = 'Boranını seviyor musun?';
+        _reactionFeedback = 'Vay be, onu sonsuz çok seviyorsun!';
+        _message = 'Daha “EVET” demeden kalbin cevap verdi 💙';
       });
+      _timer = Timer(const Duration(milliseconds: 1800), _scheduleReaction);
+      return;
     }
+    final elapsed = DateTime.now().difference(_reactionStarted!).inMilliseconds;
+    final percent = (112 - elapsed / 11).round().clamp(0, 100);
+    _persistScore(percent);
+    final phraseIndex = ((100 - percent) * _reactionPhrases.length ~/ 101)
+        .clamp(0, _reactionPhrases.length - 1);
+    setState(() {
+      _ready = false;
+      _reactionButtonText = 'Boranını seviyor musun?';
+      _reactionFeedback = _reactionPhrases[phraseIndex];
+      _message = '$elapsed ms • Boran sevgisi: %$percent';
+    });
+    _timer = Timer(const Duration(milliseconds: 1900), _scheduleReaction);
   }
 
   void _sudokuTap(int index) {
     const fixed = {0, 2, 5, 7, 8, 10, 13, 15};
     if (fixed.contains(index)) return;
+    _hasPlayed = true;
     setState(() => _board[index] = _board[index] % 4 + 1);
     context.read<GameProvider>().saveProgress(
       '${_progressKey}_moves',
@@ -396,72 +829,238 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
     );
     const solution = [1, 2, 3, 4, 3, 4, 1, 2, 2, 1, 4, 3, 4, 3, 2, 1];
     if (_board.join(',') == solution.join(',')) {
-      _persistScore(_score + 1);
-      setState(() => _message = 'Sudoku tamamlandı! 🌸');
-    }
-  }
-
-  void _pathTap(int index) {
-    if (_step >= _sequence.length || _sequence[_step] != index) {
-      setState(() {
-        _step = 0;
-        _message = 'Yol koptu; ilk noktadan başla.';
-      });
-      return;
-    }
-    setState(() => _step++);
-    if (_step == _sequence.length) {
-      _persistScore(_score + 1);
-      setState(() {
-        _step = 0;
-        _message = 'Yol tamamlandı! ✨';
-      });
+      _stopwatch.stop();
+      final elapsed = max(1, _stopwatch.elapsedMilliseconds);
+      _score = elapsed;
+      if (_best == 0 || elapsed < _best) {
+        _best = elapsed;
+        context.read<GameProvider>().saveProgress(_progressKey, elapsed);
+        _confetti.play();
+      }
+      _ended = true;
+      _showResult('Sudoku tamamlandı! 🌸');
     }
   }
 
   void _shoot() {
-    final distance = (_aim - _targetAim).abs();
-    if (distance < 0.06) _persistScore(_score + 1);
-    setState(() {
-      _message = distance < 0.06 ? 'Tam isabet! 🎯' : 'Biraz daha yaklaş.';
-      _targetAim = 0.12 + _random.nextDouble() * 0.76;
+    if (_shotStage == 0) {
+      _hasPlayed = true;
+      _aim = _aimMotion.value;
+      _aimMotion.stop();
+      _angleMotion.repeat(reverse: true);
+      setState(() => _shotStage = 1);
+      return;
+    }
+    if (_shotStage == 1) {
+      _angle = -.55 + _angleMotion.value * 1.1;
+      _angleMotion.stop();
+      _powerMotion.repeat(reverse: true);
+      setState(() => _shotStage = 2);
+      return;
+    }
+    if (_shotStage == 2) {
+      _power = _powerMotion.value;
+      _powerMotion.stop();
+      setState(() => _shotStage = 3);
+      return;
+    }
+    if (_shotStage != 3) return;
+    final travel = .34 + _power * .64;
+    _shotEnd = Offset(
+      (_aim + sin(_angle) * travel).clamp(.02, .98),
+      (.9 - cos(_angle) * travel).clamp(.04, .92),
+    );
+    setState(() => _shotStage = 4);
+    _launchMotion.forward(from: 0).then((_) {
+      if (!mounted) return;
+      final distance = (_shotEnd - Offset(_targetAim, _targetY)).distance;
+      final love = (100 - distance * 125).round().clamp(0, 100);
+      _persistScore(love);
+      _ended = true;
+      _message = 'Boranına olan sevgin: %$love';
+      _showResult('');
     });
+  }
+
+  Future<void> _showResult(String detail, {bool stopped = false}) async {
+    if (!mounted || _showingResult) return;
+    if (stopped && !_hasPlayed && _score == 0) {
+      Navigator.of(context).pop();
+      return;
+    }
+    _showingResult = true;
+    final lowerIsBetter = const {
+      CuteArcadeGame.slidingPuzzle,
+      CuteArcadeGame.miniSudoku,
+    }.contains(widget.game);
+    if (stopped) {
+      final partial =
+          (widget.game == CuteArcadeGame.slidingPuzzle ||
+              widget.game == CuteArcadeGame.miniSudoku)
+          ? _stopwatch.elapsedMilliseconds
+          : _score;
+      await context.read<GameProvider>().saveProgress(
+        '${_progressKey}_partial',
+        partial,
+      );
+      if (!mounted) return;
+    }
+    if (!lowerIsBetter && _score > _best) _persistScore(_score);
+    final scoreText = switch (widget.game) {
+      CuteArcadeGame.targetShot =>
+        'Boranına olan sevgin: %$_score\nMaksimum sevgi: %$_best',
+      CuteArcadeGame.reaction =>
+        'Boran sevgisi: %$_score\nMaksimum sevgi: %$_best',
+      CuteArcadeGame.slidingPuzzle || CuteArcadeGame.miniSudoku =>
+        'Süre: ${(_score / 1000).toStringAsFixed(2)} sn\nRekor: ${(_best / 1000).toStringAsFixed(2)} sn',
+      _ => 'Skor: $_score • Maksimum: $_best',
+    };
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        title: const Text('Oyun bitti'),
+        content: Text('${detail.isEmpty ? '' : '$detail\n\n'}$scoreText'),
+        actions: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pop(context);
+            },
+            child: const Text('Geri çık'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              setState(() {
+                _score = 0;
+                _hasPlayed = false;
+                _recordCelebrated = false;
+                _showingResult = false;
+                _stopwatch
+                  ..reset()
+                  ..start();
+                _resetRound();
+              });
+            },
+            child: const Text('Tekrar oyna'),
+          ),
+        ],
+      ),
+    );
+    _showingResult = false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.game.title),
-        actions: [
-          Center(child: Text('Puan $_score')),
-          IconButton(
-            onPressed: () => setState(_resetRound),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                Text(widget.game.description, textAlign: TextAlign.center),
-                if (_message.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.all(10),
-                    child: Text(
-                      _message,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _showResult('', stopped: true);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: _nightMode ? const Color(0xFF101725) : null,
+          foregroundColor: _nightMode ? Colors.white : null,
+          title: Text(widget.game.title),
+          actions: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Text(
+                  _appScoreText,
+                  style: const TextStyle(fontSize: 12),
+                ),
+              ),
+            ),
+            const SizedBox(width: 52),
+          ],
+        ),
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: _nightMode || _timeDangerColor != null
+                      ? null
+                      : AppTheme.backgroundGradient,
+                  color: _nightMode
+                      ? const Color(0xFF101725)
+                      : _timeDangerColor,
+                ),
+                child: SafeArea(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Text(
+                          widget.game.description,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: _nightMode ? Colors.white : null,
+                          ),
+                        ),
+                        if (widget.game == CuteArcadeGame.patternMemory)
+                          Text(
+                            'Can: ${'♥' * _lives} • ${_inputEnabled ? 'Sıra sende' : 'Deseni izle'}',
+                            style: TextStyle(
+                              color: _nightMode
+                                  ? Colors.white
+                                  : AppTheme.deepPurple,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        SizedBox(
+                          height: 46,
+                          child: Center(
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 180),
+                              child: Text(
+                                _message,
+                                key: ValueKey(_message),
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: _nightMode ? Colors.white : null,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10),
+                        Expanded(
+                          child: DefaultTextStyle.merge(
+                            style: TextStyle(
+                              color: _nightMode ? Colors.white : null,
+                            ),
+                            child: _gameBody(),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                const SizedBox(height: 10),
-                Expanded(child: _gameBody()),
-              ],
+                ),
+              ),
             ),
-          ),
+            if (_isTimedGame && _seconds <= 5 && !_ended)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: _TimePressureOverlay(
+                    seconds: _seconds,
+                    totalSeconds: _roundTotalSeconds,
+                  ),
+                ),
+              ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confetti,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 16,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -474,14 +1073,9 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
     CuteArcadeGame.maze => _maze(),
     CuteArcadeGame.slidingPuzzle => _sliding(),
     CuteArcadeGame.wordHunt => _wordHunt(),
-    CuteArcadeGame.numberMerge => _mergeGrid(),
     CuteArcadeGame.reaction => _reaction(),
-    CuteArcadeGame.balloonMatch => _balloons(),
     CuteArcadeGame.miniSudoku => _sudoku(),
-    CuteArcadeGame.drawPath => _path(),
     CuteArcadeGame.targetShot => _targetGame(),
-    CuteArcadeGame.emojiPuzzle => _differenceGrid(true),
-    CuteArcadeGame.rhythm => _sequenceGrid(4),
   };
 
   Widget _grid(int count, int columns, Widget Function(int) child) =>
@@ -498,36 +1092,56 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
 
   Widget _sequenceGrid(int count) => _grid(
     count,
-    count == 4 ? 2 : 3,
+    3,
     (index) => _tile(
-      color: _activeTile == index ? AppTheme.primaryPink : Colors.white,
+      color: _activeTile == index
+          ? AppTheme.primaryPink
+          : !_inputEnabled
+          ? const Color(0xFF687386)
+          : _nightMode
+          ? const Color(0xFF26364B)
+          : Colors.white,
       onTap: () => _sequenceTap(index),
       child: Icon(
-        widget.game == CuteArcadeGame.rhythm
-            ? Icons.music_note
-            : Icons.favorite,
+        Icons.favorite,
         color: _activeTile == index ? Colors.white : Colors.pink.shade200,
       ),
     ),
   );
 
-  Widget _differenceGrid(bool emoji) => _grid(
-    36,
-    6,
-    (index) => _tile(
-      onTap: () => _pickDifference(index),
-      child: Text(
-        emoji
-            ? (index == _target ? '😺' : '😸')
-            : (index == _target ? '◆' : '●'),
-        style: const TextStyle(fontSize: 24),
+  Widget _differenceGrid(bool emoji) => Column(
+    children: [
+      if (!emoji)
+        Text(
+          'Tur ${_score + 1} • $_seconds sn',
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ),
+      const SizedBox(height: 8),
+      Expanded(
+        child: _grid(
+          36,
+          6,
+          (index) => _tile(
+            onTap: () => _pickDifference(index),
+            child: Text(
+              emoji
+                  ? (index == _target ? '😺' : '😸')
+                  : (index == _target
+                        ? _differencePairs[_differenceStyle].$2
+                        : _differencePairs[_differenceStyle].$1),
+              style: const TextStyle(fontSize: 24),
+            ),
+          ),
+        ),
       ),
-    ),
+    ],
   );
 
   Widget _quickGrid() => Column(
     children: [
-      Text('Süre: $_seconds sn'),
+      Text(
+        'Süre: $_seconds sn${_quickTargets.length == 2 ? ' • Çift hedef!' : ''}',
+      ),
       const SizedBox(height: 10),
       Expanded(
         child: _grid(
@@ -535,9 +1149,24 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
           5,
           (index) => _tile(
             onTap: () => _quickTap(index),
-            color: index == _target ? AppTheme.primaryPink : Colors.white,
-            child: index == _target
-                ? const Icon(Icons.favorite, color: Colors.white)
+            color: _quickTargets.containsKey(index)
+                ? AppTheme.primaryPink
+                : Colors.white,
+            child: _quickTargets.containsKey(index)
+                ? Padding(
+                    padding: const EdgeInsets.all(3),
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: Text(
+                        _quickTargets[index]!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  )
                 : null,
           ),
         ),
@@ -547,207 +1176,370 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
 
   Widget _maze() => Column(
     children: [
+      Text('$_seconds sn • $_mazeSide×$_mazeSide • ${_mazeExits.length} çıkış'),
       Expanded(
-        child: _grid(25, 5, (index) {
-          const walls = {6, 7, 8, 13, 16, 18};
-          return _tile(
-            color: walls.contains(index) ? Colors.pink.shade200 : Colors.white,
-            child: index == _position
-                ? const Icon(Icons.circle, color: AppTheme.primaryPink)
-                : index == _target
-                ? const Icon(Icons.flag, color: Colors.green)
-                : null,
-          );
-        }),
+        child: Center(
+          child: AspectRatio(
+            aspectRatio: 1,
+            child: CustomPaint(
+              painter: _MazeBoardPainter(
+                side: _mazeSide,
+                passages: _mazePassages,
+                position: _position,
+                targets: _mazeExits,
+                reuniting: _mazeReuniting,
+              ),
+            ),
+          ),
+        ),
       ),
-      Wrap(
-        children: [
-          IconButton(
-            onPressed: () => _move(-5),
-            icon: const Icon(Icons.arrow_upward),
-          ),
-          IconButton(
-            onPressed: () => _move(-1),
-            icon: const Icon(Icons.arrow_back),
-          ),
-          IconButton(
-            onPressed: () => _move(1),
-            icon: const Icon(Icons.arrow_forward),
-          ),
-          IconButton(
-            onPressed: () => _move(5),
-            icon: const Icon(Icons.arrow_downward),
-          ),
-        ],
+      SizedBox(
+        width: 150,
+        height: 130,
+        child: Stack(
+          children: [
+            Positioned(
+              top: 0,
+              left: 51,
+              child: _arrow(Icons.arrow_upward, -_mazeSide),
+            ),
+            Positioned(left: 4, top: 43, child: _arrow(Icons.arrow_back, -1)),
+            Positioned(
+              right: 4,
+              top: 43,
+              child: _arrow(Icons.arrow_forward, 1),
+            ),
+            Positioned(
+              bottom: 0,
+              left: 51,
+              child: _arrow(Icons.arrow_downward, _mazeSide),
+            ),
+          ],
+        ),
       ),
     ],
   );
 
-  Widget _sliding() => _grid(
-    9,
-    3,
-    (index) => _board[index] == 0
-        ? const SizedBox()
-        : _tile(
-            onTap: () => _slide(index),
-            color: AppTheme.primaryPink,
-            child: Text(
-              '${_board[index]}',
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
+  Widget _arrow(IconData icon, int delta) => Material(
+    color: AppTheme.primaryPink,
+    borderRadius: BorderRadius.circular(12),
+    child: IconButton(
+      onPressed: () => _move(delta),
+      icon: Icon(icon, color: Colors.white),
+    ),
   );
 
-  static const _words = ['MAVİ', 'PEMBE', 'ÇİÇEK', 'YILDIZ', 'BULUT', 'MASAL'];
+  Widget _sliding() => Column(
+    children: [
+      _ElapsedTime(stopwatch: _stopwatch),
+      const SizedBox(height: 8),
+      Expanded(
+        child: _grid(
+          9,
+          3,
+          (index) => _board[index] == 0
+              ? const SizedBox()
+              : _tile(
+                  onTap: () => _slide(index),
+                  color: AppTheme.primaryPink,
+                  child: Text(
+                    '${_board[index]}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+        ),
+      ),
+      const Text('Aynı sıradaki iki taşı birlikte itebilirsin.'),
+    ],
+  );
+
   Widget _wordHunt() {
-    final mixed = _words[_target].split('')..shuffle(Random(_target));
+    final level = _wordLevels[_target];
+    final words = level.allWords;
+    final letters = _wordLetters;
+    final current = _wordSelected.map((index) => letters[index]).join();
     return Column(
       children: [
-        Wrap(
-          spacing: 8,
-          children: mixed
-              .map(
-                (letter) => Chip(
-                  label: Text(letter, style: const TextStyle(fontSize: 24)),
-                ),
-              )
-              .toList(),
+        Expanded(
+          child: SingleChildScrollView(
+            child: Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              alignment: WrapAlignment.center,
+              children: words
+                  .map(
+                    (word) => Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: _foundWords.contains(word)
+                            ? Colors.green.shade100
+                            : _nightMode
+                            ? const Color(0xFF27364B)
+                            : Colors.white,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        _foundWords.contains(word)
+                            ? word.toUpperCase()
+                            : List.filled(word.length, '□').join(' '),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )
+                  .toList(),
+            ),
+          ),
         ),
-        const SizedBox(height: 24),
-        TextField(
-          controller: _wordController,
-          textCapitalization: TextCapitalization.characters,
-          textAlign: TextAlign.center,
-          decoration: const InputDecoration(labelText: 'Kelimeyi yaz'),
+        Text(
+          current,
+          style: const TextStyle(
+            fontSize: 22,
+            color: AppTheme.primaryPink,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-        const SizedBox(height: 12),
-        FilledButton(onPressed: _checkWord, child: const Text('Kontrol et')),
+        Center(
+          child: SizedBox(
+            width: 250,
+            height: 250,
+            child: LayoutBuilder(
+              builder: (_, box) {
+                final center = Offset(box.maxWidth / 2, box.maxHeight / 2);
+                final radius = min(91.0, box.maxWidth / 2 - 32);
+                final points = List.generate(
+                  letters.length,
+                  (i) =>
+                      center +
+                      Offset(
+                            cos(-pi / 2 + i * 2 * pi / letters.length),
+                            sin(-pi / 2 + i * 2 * pi / letters.length),
+                          ) *
+                          radius,
+                );
+                int? hit(Offset point) {
+                  for (var i = 0; i < points.length; i++) {
+                    if ((points[i] - point).distance < 32) return i;
+                  }
+                  return null;
+                }
+
+                return GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onPanDown: (details) {
+                    final index = hit(details.localPosition);
+                    if (index != null) _wordDragLetter(index);
+                  },
+                  onPanUpdate: (details) {
+                    final index = hit(details.localPosition);
+                    if (index != null) _wordDragLetter(index);
+                    setState(() => _wordPointer = details.localPosition);
+                  },
+                  onPanEnd: (_) => _finishWordDrag(letters),
+                  onPanCancel: () => setState(() {
+                    _wordSelected.clear();
+                    _wordPointer = null;
+                  }),
+                  child: CustomPaint(
+                    size: Size.infinite,
+                    painter: _LetterWheelPainter(
+                      letters: letters,
+                      points: points,
+                      selected: _wordSelected,
+                      pointer: _wordPointer,
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ),
       ],
     );
   }
 
-  Widget _mergeGrid() => _grid(
-    16,
-    4,
-    (index) => _tile(
-      onTap: () => _merge(index),
-      color: _firstChoice == index
-          ? Colors.purple.shade300
-          : Colors.pink.shade100,
-      child: Text(
-        '${_board[index]}',
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-      ),
+  Widget _reaction() => Center(
+    child: Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        SizedBox(
+          height: 82,
+          child: Center(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 180),
+              child: Text(
+                _reactionFeedback,
+                key: ValueKey(_reactionFeedback),
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  fontSize: 21,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+        ),
+        GestureDetector(
+          onTap: _reactionTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: 220,
+            height: 220,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: _ready ? Colors.green : AppTheme.primaryPink,
+            ),
+            child: Center(
+              child: Text(
+                _reactionButtonText,
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     ),
   );
 
-  Widget _reaction() => Center(
-    child: GestureDetector(
-      onTap: _reactionTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        width: 220,
-        height: 220,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: _ready ? Colors.green : AppTheme.primaryPink,
-        ),
-        child: Center(
-          child: Text(
-            _ready ? 'DOKUN!' : 'BEKLE',
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
+  Widget _sudoku() => Column(
+    children: [
+      _ElapsedTime(stopwatch: _stopwatch),
+      const SizedBox(height: 8),
+      Expanded(
+        child: _grid(
+          16,
+          4,
+          (index) => _tile(
+            onTap: () => _sudokuTap(index),
+            color: Colors.white,
+            child: Text(
+              _board[index] == 0
+                  ? ''
+                  : const ['', 'E', 'L', 'İ', 'F'][_board[index]],
+              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ),
         ),
       ),
-    ),
+    ],
   );
-
-  Widget _balloons() => _grid(12, 3, (index) {
-    final open = _revealed.contains(index) || _matched.contains(index);
-    return _tile(
-      onTap: () => _matchBalloon(index),
-      color: open ? Colors.white : AppTheme.primaryPink,
-      child: open
-          ? Text(
-              ['🎈', '🌸', '⭐', '🍓', '🦋', '🍬'][_board[index]],
-              style: const TextStyle(fontSize: 30),
-            )
-          : const Icon(Icons.question_mark, color: Colors.white),
-    );
-  });
-
-  Widget _sudoku() => _grid(
-    16,
-    4,
-    (index) => _tile(
-      onTap: () => _sudokuTap(index),
-      color: Colors.white,
-      child: Text(
-        _board[index] == 0 ? '' : '${_board[index]}',
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      ),
-    ),
-  );
-
-  Widget _path() => _grid(25, 5, (index) {
-    final pathIndex = _sequence.indexOf(index);
-    final done = pathIndex >= 0 && pathIndex < _step;
-    return _tile(
-      onTap: () => _pathTap(index),
-      color: done ? AppTheme.primaryPink : Colors.white,
-      child: pathIndex >= 0
-          ? Text(
-              '${pathIndex + 1}',
-              style: TextStyle(
-                color: done ? Colors.white : AppTheme.primaryPink,
-                fontWeight: FontWeight.bold,
-              ),
-            )
-          : null,
-    );
-  });
 
   Widget _targetGame() => Column(
     children: [
       Expanded(
         child: LayoutBuilder(
-          builder: (_, box) => Stack(
-            children: [
-              Positioned(
-                left: _targetAim * (box.maxWidth - 70),
-                top: 70,
-                child: const Icon(
-                  Icons.gps_fixed,
-                  color: Colors.purple,
-                  size: 70,
-                ),
-              ),
-              Positioned(
-                left: _aim * (box.maxWidth - 50),
-                bottom: 20,
-                child: const Icon(
-                  Icons.favorite,
-                  color: AppTheme.primaryPink,
-                  size: 50,
-                ),
-              ),
-            ],
+          builder: (_, box) => AnimatedBuilder(
+            animation: Listenable.merge([
+              _aimMotion,
+              _angleMotion,
+              _powerMotion,
+              _launchMotion,
+            ]),
+            builder: (_, _) {
+              final aim = _shotStage == 0 ? _aimMotion.value : _aim;
+              final liveAngle = _shotStage == 1
+                  ? -.55 + _angleMotion.value * 1.1
+                  : _angle;
+              final start = Offset(aim, .9);
+              final progress = Curves.easeOutCubic.transform(
+                _launchMotion.value,
+              );
+              final heart = _shotStage == 4
+                  ? Offset(
+                      start.dx + (_shotEnd.dx - start.dx) * progress,
+                      start.dy +
+                          (_shotEnd.dy - start.dy) * progress -
+                          sin(pi * progress) * .14,
+                    )
+                  : start;
+              return Stack(
+                children: [
+                  Positioned(
+                    left: _targetAim * (box.maxWidth - 62),
+                    top: _targetY * (box.maxHeight - 34),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 9,
+                        vertical: 5,
+                      ),
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        'Boran',
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    left: heart.dx * (box.maxWidth - 50),
+                    top: heart.dy * (box.maxHeight - 50),
+                    child: const Icon(
+                      Icons.favorite,
+                      color: Color(0xFF1877F2),
+                      size: 50,
+                    ),
+                  ),
+                  if (_shotStage >= 1 && _shotStage < 4)
+                    Positioned(
+                      left: aim * (box.maxWidth - 50) + 9,
+                      bottom: 68,
+                      child: Transform.rotate(
+                        angle: liveAngle,
+                        alignment: Alignment.bottomCenter,
+                        child: const _AimArrow(),
+                      ),
+                    ),
+                  if (_shotStage >= 2 && _shotStage < 4)
+                    Positioned(
+                      right: 8,
+                      top: 35,
+                      bottom: 35,
+                      child: Container(
+                        width: 22,
+                        alignment: Alignment.bottomCenter,
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.purple),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: FractionallySizedBox(
+                          heightFactor: _shotStage == 2
+                              ? _powerMotion.value
+                              : _power,
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryPink,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
         ),
       ),
-      Slider(value: _aim, onChanged: (value) => setState(() => _aim = value)),
       FilledButton.icon(
-        onPressed: _shoot,
-        icon: const Icon(Icons.arrow_upward),
-        label: const Text('Atış yap'),
+        onPressed: _shotStage == 4 ? null : _shoot,
+        icon: Icon(_shotStage < 3 ? Icons.stop_circle : Icons.favorite),
+        label: Text(_shotStage < 3 ? 'Durdur' : 'Boranına sevgini göster'),
       ),
     ],
   );
@@ -757,7 +1549,9 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
     Color color = Colors.white,
     VoidCallback? onTap,
   }) => Material(
-    color: color,
+    color: _nightMode && color == Colors.white
+        ? const Color(0xFF27364B)
+        : color,
     borderRadius: BorderRadius.circular(14),
     child: InkWell(
       onTap: onTap,
@@ -765,4 +1559,356 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
       child: Center(child: child),
     ),
   );
+}
+
+class _AimArrow extends StatelessWidget {
+  const _AimArrow();
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+    width: 56,
+    height: 152,
+    child: Column(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        const Icon(
+          Icons.arrow_drop_up_rounded,
+          color: Color(0xFF1877F2),
+          size: 46,
+        ),
+        Container(
+          width: 6,
+          height: 98,
+          decoration: BoxDecoration(
+            color: const Color(0xFF1877F2),
+            borderRadius: BorderRadius.circular(4),
+            boxShadow: const [
+              BoxShadow(color: Color(0x661877F2), blurRadius: 8),
+            ],
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+class _ElapsedTime extends StatefulWidget {
+  final Stopwatch stopwatch;
+  const _ElapsedTime({required this.stopwatch});
+
+  @override
+  State<_ElapsedTime> createState() => _ElapsedTimeState();
+}
+
+class _TimePressureOverlay extends StatelessWidget {
+  final int seconds;
+  final int totalSeconds;
+
+  const _TimePressureOverlay({
+    required this.seconds,
+    required this.totalSeconds,
+  });
+
+  @override
+  Widget build(BuildContext context) => TweenAnimationBuilder<double>(
+    key: ValueKey(seconds),
+    tween: Tween(begin: .82, end: 1),
+    duration: const Duration(milliseconds: 450),
+    curve: Curves.easeOutBack,
+    builder: (_, pulse, _) => Stack(
+      children: [
+        Positioned.fill(
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.red.withValues(alpha: .35 + .2 * pulse),
+                width: 7,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.red.withValues(alpha: .12 * pulse),
+                  blurRadius: 45,
+                  spreadRadius: 18,
+                ),
+              ],
+            ),
+          ),
+        ),
+        Positioned(
+          top: 18,
+          left: 0,
+          right: 0,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 7),
+              decoration: BoxDecoration(
+                color: Colors.red.shade700,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: const [
+                  BoxShadow(color: Colors.redAccent, blurRadius: 18),
+                ],
+              ),
+              child: const Text(
+                'ACELE ET!  •  SON SANİYELER',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+          ),
+        ),
+        if (seconds <= 3)
+          Center(
+            child: Transform.scale(
+              scale: pulse,
+              child: SizedBox(
+                width: 245,
+                height: 245,
+                child: CustomPaint(
+                  painter: _CountdownRingPainter(
+                    progress: 1 - seconds / max(1, totalSeconds),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '$seconds',
+                      style: TextStyle(
+                        color: Colors.red.shade700,
+                        fontSize: 108,
+                        height: 1,
+                        fontWeight: FontWeight.w900,
+                        shadows: const [
+                          Shadow(color: Colors.white, blurRadius: 12),
+                          Shadow(color: Colors.redAccent, blurRadius: 28),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
+    ),
+  );
+}
+
+class _CountdownRingPainter extends CustomPainter {
+  final double progress;
+  const _CountdownRingPainter({required this.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = size.center(Offset.zero);
+    final radius = size.shortestSide / 2 - 12;
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = Colors.white.withValues(alpha: .52)
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = Colors.red.withValues(alpha: .55)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 8,
+    );
+    final angle = -pi / 2 + 2 * pi * progress;
+    final marker = center + Offset(cos(angle), sin(angle)) * radius;
+    canvas.drawCircle(marker, 11, Paint()..color = Colors.red.shade800);
+    canvas.drawCircle(
+      marker,
+      19,
+      Paint()..color = Colors.red.withValues(alpha: .2),
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant _CountdownRingPainter oldDelegate) =>
+      oldDelegate.progress != progress;
+}
+
+class _ElapsedTimeState extends State<_ElapsedTime> {
+  Timer? _ticker;
+
+  @override
+  void initState() {
+    super.initState();
+    _ticker = Timer.periodic(const Duration(milliseconds: 100), (_) {
+      if (mounted) setState(() {});
+    });
+  }
+
+  @override
+  void dispose() {
+    _ticker?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Text(
+    '${(widget.stopwatch.elapsedMilliseconds / 1000).toStringAsFixed(1)} sn',
+    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  );
+}
+
+class _MazeBoardPainter extends CustomPainter {
+  final int side;
+  final Set<(int, int)> passages;
+  final int position;
+  final Set<int> targets;
+  final bool reuniting;
+
+  const _MazeBoardPainter({
+    required this.side,
+    required this.passages,
+    required this.position,
+    required this.targets,
+    required this.reuniting,
+  });
+
+  (int, int) _edge(int a, int b) => a < b ? (a, b) : (b, a);
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cell = size.width / side;
+    canvas.drawRect(Offset.zero & size, Paint()..color = Colors.white);
+    final wall = Paint()
+      ..color = const Color(0xFF7B2E65)
+      ..strokeWidth = 2;
+    for (var index = 0; index < side * side; index++) {
+      final row = index ~/ side;
+      final column = index % side;
+      final x = column * cell;
+      final y = row * cell;
+      if (row == 0 || !passages.contains(_edge(index, index - side))) {
+        canvas.drawLine(Offset(x, y), Offset(x + cell, y), wall);
+      }
+      if (column == 0 || !passages.contains(_edge(index, index - 1))) {
+        canvas.drawLine(Offset(x, y), Offset(x, y + cell), wall);
+      }
+      if (row == side - 1) {
+        canvas.drawLine(Offset(x, y + cell), Offset(x + cell, y + cell), wall);
+      }
+      if (column == side - 1) {
+        canvas.drawLine(Offset(x + cell, y), Offset(x + cell, y + cell), wall);
+      }
+    }
+    Offset center(int index) =>
+        Offset((index % side + .5) * cell, (index ~/ side + .5) * cell);
+    if (reuniting) {
+      final text = TextPainter(
+        text: const TextSpan(
+          text: 'Aşıklar\nkavuştu 💞',
+          style: TextStyle(
+            color: AppTheme.primaryPink,
+            fontWeight: FontWeight.bold,
+            fontSize: 10,
+          ),
+        ),
+        textAlign: TextAlign.center,
+        textDirection: TextDirection.ltr,
+      )..layout(maxWidth: cell * 2.4);
+      text.paint(
+        canvas,
+        center(position) - Offset(text.width / 2, text.height / 2),
+      );
+    } else {
+      for (final target in targets) {
+        _paintMazeName(canvas, center(target), 'Boran', Colors.blue, cell);
+      }
+      _paintMazeName(
+        canvas,
+        center(position),
+        'Elif',
+        AppTheme.primaryPink,
+        cell,
+      );
+    }
+  }
+
+  void _paintMazeName(
+    Canvas canvas,
+    Offset center,
+    String value,
+    Color color,
+    double cell,
+  ) {
+    final text = TextPainter(
+      text: TextSpan(
+        text: value,
+        style: TextStyle(
+          color: color,
+          fontWeight: FontWeight.w900,
+          fontSize: min(12, cell * .42),
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    text.paint(canvas, center - Offset(text.width / 2, text.height / 2));
+  }
+
+  @override
+  bool shouldRepaint(covariant _MazeBoardPainter oldDelegate) =>
+      oldDelegate.position != position ||
+      oldDelegate.side != side ||
+      oldDelegate.passages != passages ||
+      oldDelegate.reuniting != reuniting;
+}
+
+class _LetterWheelPainter extends CustomPainter {
+  final List<String> letters;
+  final List<Offset> points;
+  final List<int> selected;
+  final Offset? pointer;
+
+  const _LetterWheelPainter({
+    required this.letters,
+    required this.points,
+    required this.selected,
+    required this.pointer,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final line = Paint()
+      ..color = AppTheme.primaryPink
+      ..strokeWidth = 7
+      ..strokeCap = StrokeCap.round;
+    for (var i = 1; i < selected.length; i++) {
+      canvas.drawLine(points[selected[i - 1]], points[selected[i]], line);
+    }
+    if (selected.isNotEmpty && pointer != null) {
+      canvas.drawLine(points[selected.last], pointer!, line);
+    }
+    for (var i = 0; i < points.length; i++) {
+      final active = selected.contains(i);
+      canvas.drawCircle(
+        points[i],
+        29,
+        Paint()..color = active ? AppTheme.primaryPink : Colors.white,
+      );
+      final text = TextPainter(
+        text: TextSpan(
+          text: letters[i],
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: active ? Colors.white : AppTheme.deepPurple,
+          ),
+        ),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      text.paint(canvas, points[i] - Offset(text.width / 2, text.height / 2));
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _LetterWheelPainter oldDelegate) =>
+      oldDelegate.selected.join(',') != selected.join(',') ||
+      oldDelegate.letters.join() != letters.join() ||
+      oldDelegate.pointer != pointer;
 }

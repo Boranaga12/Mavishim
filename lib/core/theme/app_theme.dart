@@ -108,4 +108,56 @@ abstract final class AppTheme {
       ),
     );
   }
+
+  static ThemeData get darkTheme {
+    final scheme = ColorScheme.fromSeed(
+      seedColor: primaryPink,
+      brightness: Brightness.dark,
+      primary: secondaryPink,
+      secondary: accentPeach,
+      surface: const Color(0xFF182233),
+    );
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      scaffoldBackgroundColor: const Color(0xFF101725),
+      colorScheme: scheme,
+      fontFamily: 'Outfit',
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Color(0xFF101725),
+        foregroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+      ),
+      cardTheme: CardThemeData(
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        color: const Color(0xFF182233),
+      ),
+      navigationBarTheme: const NavigationBarThemeData(
+        height: 72,
+        backgroundColor: Color(0xFF182233),
+        indicatorColor: Color(0xFF59304C),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(48, 48),
+          backgroundColor: primaryPink,
+          foregroundColor: Colors.white,
+        ),
+      ),
+      iconButtonTheme: const IconButtonThemeData(
+        style: ButtonStyle(minimumSize: WidgetStatePropertyAll(Size(48, 48))),
+      ),
+    );
+  }
+
+  static BoxDecoration pageBackground(BuildContext context) => BoxDecoration(
+    gradient: Theme.of(context).brightness == Brightness.dark
+        ? null
+        : backgroundGradient,
+    color: Theme.of(context).brightness == Brightness.dark
+        ? const Color(0xFF101725)
+        : null,
+  );
 }

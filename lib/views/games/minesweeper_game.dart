@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
 
 import '../../providers/game_provider.dart';
 
@@ -20,20 +21,39 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
   bool _flagMode = false;
   bool _gameOver = false;
   bool _won = false;
+  bool _minesPlaced = false;
   int _wins = 0;
+  late ConfettiController _confetti;
+  bool get _nightMode => Theme.of(context).brightness == Brightness.dark;
 
   @override
   void initState() {
     super.initState();
     _wins = context.read<GameProvider>().progressFor('minesweeper');
+    _confetti = ConfettiController(duration: const Duration(milliseconds: 900));
     _newGame();
+  }
+
+  @override
+  void dispose() {
+    _confetti.dispose();
+    super.dispose();
   }
 
   void _newGame() {
     _cells = List.generate(_side * _side, (_) => _MineCell());
+    _minesPlaced = false;
+    _flagMode = false;
+    _gameOver = false;
+    _won = false;
+  }
+
+  void _placeMines(int firstIndex) {
+    final protected = {firstIndex, ..._neighbors(firstIndex)};
     final places = <int>{};
     while (places.length < _mineCount) {
-      places.add(_random.nextInt(_cells.length));
+      final candidate = _random.nextInt(_cells.length);
+      if (!protected.contains(candidate)) places.add(candidate);
     }
     for (final index in places) {
       _cells[index].isMine = true;
@@ -43,9 +63,7 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
         index,
       ).where((neighbor) => _cells[neighbor].isMine).length;
     }
-    _flagMode = false;
-    _gameOver = false;
-    _won = false;
+    _minesPlaced = true;
   }
 
   Iterable<int> _neighbors(int index) sync* {
@@ -68,6 +86,7 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
 
   void _tapCell(int index) {
     if (_gameOver || _cells[index].isRevealed) return;
+    if (!_minesPlaced && !_flagMode) _placeMines(index);
     setState(() {
       final cell = _cells[index];
       if (_flagMode) {
@@ -90,8 +109,55 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
       if (_won) {
         _wins++;
         context.read<GameProvider>().saveProgress('minesweeper', _wins);
+        _confetti.play();
       }
     });
+    if (_gameOver) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showResult());
+    }
+  }
+
+  Future<void> _showResult({bool stopped = false}) async {
+    if (!mounted) return;
+    if (stopped) {
+      final opened = _cells
+          .where((cell) => cell.isRevealed && !cell.isMine)
+          .length;
+      if (opened == 0 && !_cells.any((cell) => cell.isFlagged)) {
+        Navigator.of(context).pop();
+        return;
+      }
+      await context.read<GameProvider>().saveProgress(
+        'minesweeper_partial',
+        opened,
+      );
+    }
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        title: const Text('Oyun bitti'),
+        content: Text('Galibiyet: $_wins • Maksimum: $_wins'),
+        actions: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pop(context);
+            },
+            child: const Text('Geri çık'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              setState(_newGame);
+            },
+            child: const Text('Tekrar oyna'),
+          ),
+        ],
+      ),
+    );
   }
 
   void _reveal(int index) {
@@ -108,62 +174,82 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
   @override
   Widget build(BuildContext context) {
     final flags = _cells.where((cell) => cell.isFlagged).length;
-    return Scaffold(
-      backgroundColor: const Color(0xFFFFEEF5),
-      appBar: AppBar(
-        title: const Text('Mayın Tarlası'),
-        actions: [
-          IconButton(
-            onPressed: () => setState(_newGame),
-            icon: const Icon(Icons.refresh),
-          ),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text('Mayın: $_mineCount • Galibiyet: $_wins'),
-                  FilledButton.tonalIcon(
-                    onPressed: () => setState(() => _flagMode = !_flagMode),
-                    icon: Icon(_flagMode ? Icons.flag : Icons.flag_outlined),
-                    label: Text('Bayrak: $flags'),
-                  ),
-                ],
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _showResult(stopped: true);
+      },
+      child: Scaffold(
+        backgroundColor: _nightMode
+            ? const Color(0xFF101725)
+            : const Color(0xFFFFEEF5),
+        appBar: AppBar(
+          backgroundColor: _nightMode ? const Color(0xFF101725) : null,
+          foregroundColor: _nightMode ? Colors.white : null,
+          title: const Text('Mayın Tarlası'),
+          actions: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(right: 16),
+                child: Text('Maksimum: $_wins'),
               ),
-              const SizedBox(height: 16),
-              Expanded(
-                child: Center(
-                  child: AspectRatio(
-                    aspectRatio: 1,
-                    child: GridView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _cells.length,
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: _side,
-                            crossAxisSpacing: 3,
-                            mainAxisSpacing: 3,
+            ),
+            const SizedBox(width: 52),
+          ],
+        ),
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Mayın: $_mineCount • Galibiyet: $_wins'),
+                        FilledButton.tonalIcon(
+                          onPressed: () =>
+                              setState(() => _flagMode = !_flagMode),
+                          icon: Icon(
+                            _flagMode ? Icons.flag : Icons.flag_outlined,
                           ),
-                      itemBuilder: (_, index) => _cell(index),
+                          label: Text('Bayrak: $flags'),
+                        ),
+                      ],
                     ),
-                  ),
+                    const SizedBox(height: 16),
+                    Expanded(
+                      child: Center(
+                        child: AspectRatio(
+                          aspectRatio: 1,
+                          child: GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: _cells.length,
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: _side,
+                                  crossAxisSpacing: 3,
+                                  mainAxisSpacing: 3,
+                                ),
+                            itemBuilder: (_, index) => _cell(index),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              if (_gameOver)
-                Padding(
-                  padding: const EdgeInsets.only(top: 12),
-                  child: Text(
-                    _won ? 'Kazandın! ✨' : 'Mayına bastın!',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-            ],
-          ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confetti,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 16,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -188,7 +274,11 @@ class _MinesweeperGameViewState extends State<MinesweeperGameView> {
         onTap: () => _tapCell(index),
         child: Ink(
           decoration: BoxDecoration(
-            color: cell.isRevealed ? Colors.white : const Color(0xFFFF81B5),
+            color: cell.isRevealed
+                ? _nightMode
+                      ? const Color(0xFF27364B)
+                      : Colors.white
+                : const Color(0xFFFF81B5),
             borderRadius: BorderRadius.circular(5),
           ),
           child: Center(child: content),

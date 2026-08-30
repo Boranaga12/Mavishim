@@ -20,6 +20,7 @@ dependencies:
   confetti: ^0.8.0
   hive_ce_flutter: ^2.3.4
   flutter_secure_storage: 10.0.0
+  audioplayers: ^6.7.1
 
 dev_dependencies:
   flutter_test:
@@ -31,6 +32,7 @@ flutter:
   generate: true
   assets:
     - assets/branding/
+    - assets/audio/
   fonts:
     - family: Outfit
       fonts:

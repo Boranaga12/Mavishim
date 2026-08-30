@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:confetti/confetti.dart';
 
 import '../../providers/game_provider.dart';
 
@@ -21,23 +22,28 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
   late Color _baseColor;
   late Color _oddColor;
   int _level = 1;
+  int _best = 0;
   int _hearts = 3;
-  bool _nightMode = false;
+  bool get _nightMode => Theme.of(context).brightness == Brightness.dark;
   bool _restingEyes = false;
   bool _shuffling = false;
   bool _gameOver = false;
   Timer? _restTimer;
+  late ConfettiController _confetti;
+  bool _recordCelebrated = false;
 
   @override
   void initState() {
     super.initState();
-    _level = max(1, context.read<GameProvider>().progressFor('colorHunt'));
+    _best = context.read<GameProvider>().progressFor('colorHunt');
+    _confetti = ConfettiController(duration: const Duration(milliseconds: 900));
     _startLevel();
   }
 
   @override
   void dispose() {
     _restTimer?.cancel();
+    _confetti.dispose();
     super.dispose();
   }
 
@@ -61,7 +67,14 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
   void _select(int tile) {
     if (_gameOver || _restingEyes || _shuffling) return;
     if (tile == _oddIndex) {
-      context.read<GameProvider>().saveProgress('colorHunt', _level + 1);
+      if (_level + 1 > _best) {
+        _best = _level + 1;
+        context.read<GameProvider>().saveProgress('colorHunt', _best);
+        if (!_recordCelebrated) {
+          _recordCelebrated = true;
+          _confetti.play();
+        }
+      }
       setState(() {
         _level++;
         _hearts = 3;
@@ -73,6 +86,47 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
       _hearts--;
       _gameOver = _hearts == 0;
     });
+    if (_gameOver) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _showResult());
+    }
+  }
+
+  Future<void> _showResult({bool stopped = false}) async {
+    if (!mounted) return;
+    if (stopped && _level == 1 && _hearts == 3) {
+      Navigator.of(context).pop();
+      return;
+    }
+    if (_level > _best) {
+      _best = _level;
+      await context.read<GameProvider>().saveProgress('colorHunt', _best);
+    }
+    if (!mounted) return;
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(26)),
+        title: const Text('Oyun bitti'),
+        content: Text('Seviye: $_level • Maksimum: $_best'),
+        actions: [
+          OutlinedButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              Navigator.pop(context);
+            },
+            child: const Text('Geri çık'),
+          ),
+          FilledButton(
+            onPressed: () {
+              Navigator.pop(dialogContext);
+              _restart();
+            },
+            child: const Text('Tekrar oyna'),
+          ),
+        ],
+      ),
+    );
   }
 
   Future<void> _shuffleTiles() async {
@@ -99,6 +153,7 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
     _level = 1;
     _hearts = 3;
     _gameOver = false;
+    _recordCelebrated = false;
     _startLevel();
   });
 
@@ -108,28 +163,49 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
         ? const Color(0xFF101725)
         : const Color(0xFFFFEEF5);
     final foreground = _nightMode ? Colors.white : const Color(0xFF38203A);
-    return Scaffold(
-      backgroundColor: background,
-      appBar: AppBar(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _showResult(stopped: true);
+      },
+      child: Scaffold(
         backgroundColor: background,
-        foregroundColor: foreground,
-        title: const Text('Renk Avı'),
-        actions: [
-          IconButton(onPressed: _restart, icon: const Icon(Icons.refresh)),
-        ],
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-          child: Column(
-            children: [
-              const SizedBox(height: 8),
-              _grid(),
-              const SizedBox(height: 14),
-              _controlPanel(foreground),
-              if (_gameOver) _gameOverCard(foreground),
-            ],
-          ),
+        appBar: AppBar(
+          backgroundColor: background,
+          foregroundColor: foreground,
+          title: const Text('Renk Avı'),
+          actions: [
+            Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: Center(child: Text('Maksimum: $_best')),
+            ),
+            const SizedBox(width: 52),
+          ],
+        ),
+        body: Stack(
+          children: [
+            SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    _grid(),
+                    const SizedBox(height: 14),
+                    _controlPanel(foreground),
+                  ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: ConfettiWidget(
+                confettiController: _confetti,
+                blastDirectionality: BlastDirectionality.explosive,
+                numberOfParticles: 16,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -213,12 +289,6 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
             ],
           ),
         ),
-        _control(
-          _nightMode ? Icons.light_mode_outlined : Icons.dark_mode_outlined,
-          'Gece modu',
-          () => setState(() => _nightMode = !_nightMode),
-          foreground,
-        ),
       ],
     ),
   );
@@ -235,26 +305,6 @@ class _ColorHuntGameViewState extends State<ColorHuntGameView> {
       child: IconButton(
         onPressed: action,
         icon: Icon(icon, color: color),
-      ),
-    ),
-  );
-
-  Widget _gameOverCard(Color foreground) => Padding(
-    padding: const EdgeInsets.only(top: 12),
-    child: Card(
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Oyun bitti • Ulaşılan seviye: $_level',
-                style: TextStyle(color: foreground),
-              ),
-            ),
-            TextButton(onPressed: _restart, child: const Text('Tekrar oyna')),
-          ],
-        ),
       ),
     ),
   );

@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../core/audio/app_audio.dart';
 import '../providers/cycle_provider.dart';
 import '../providers/game_provider.dart';
 import 'cycle/cycle_calendar.dart';
@@ -54,6 +57,16 @@ class _MainNavigationViewState extends State<MainNavigationView> {
         labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
         onDestinationSelected: (index) {
           if (index == _currentIndex) return;
+          unawaited(AppAudio.instance.play(AppSound.uiTap));
+          unawaited(
+            AppAudio.instance.playMusic(
+              index == 2
+                  ? AppMusic.game
+                  : index == 3
+                  ? AppMusic.romance
+                  : AppMusic.menu,
+            ),
+          );
           setState(() {
             _currentIndex = index;
             _pages[index] ??= _createPage(index);

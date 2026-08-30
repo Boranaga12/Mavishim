@@ -20,25 +20,27 @@ class GamesHubView extends StatelessWidget {
     final entries = _gameEntries();
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        decoration: AppTheme.pageBackground(context),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Eğlence & Oyunlar 🎮',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF331B29),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'İlerlemen otomatik kaydedilir; istediğin zaman devam et.',
-                  style: TextStyle(color: Colors.grey.shade700),
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 16),
                 Expanded(
@@ -149,7 +151,11 @@ class GamesHubView extends StatelessWidget {
     onTap: () => Navigator.push(
       context,
       MaterialPageRoute<void>(
-        builder: (_) => TapEffectsLayer(surfaceId: surfaceId, child: page),
+        builder: (_) => TapEffectsLayer(
+          surfaceId: surfaceId,
+          allowHeartPlacement: false,
+          child: page,
+        ),
       ),
     ),
     padding: const EdgeInsets.all(15),
@@ -172,7 +178,10 @@ class GamesHubView extends StatelessWidget {
               const SizedBox(height: 4),
               Text(
                 description,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                style: TextStyle(
+                  fontSize: 13,
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

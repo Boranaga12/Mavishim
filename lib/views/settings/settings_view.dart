@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../core/theme/app_theme.dart';
+import '../../core/audio/app_audio.dart';
 import '../../providers/cycle_provider.dart';
 import '../../providers/game_provider.dart';
 import '../../widgets/glass_card.dart';
@@ -28,18 +29,53 @@ class _SettingsViewState extends State<SettingsView> {
     final isSaving = context.select<CycleProvider, bool>(
       (value) => value.isSaving,
     );
+    final soundVolume = context.select<GameProvider, int>(
+      (value) => value.soundVolumePercent,
+    );
     _cycleLength ??= cycleLength.toDouble();
     _periodDuration ??= periodDuration.toDouble();
 
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        decoration: AppTheme.pageBackground(context),
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.all(16),
             children: [
               Text('Ayarlar', style: Theme.of(context).textTheme.headlineSmall),
               const SizedBox(height: 16),
+              GlassCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Sesler',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                    const SizedBox(height: 6),
+                    Text('Ses seviyesi: %$soundVolume'),
+                    Slider(
+                      value: soundVolume.toDouble(),
+                      min: 0,
+                      max: 100,
+                      divisions: 20,
+                      label: '%$soundVolume',
+                      onChanged: (value) => context
+                          .read<GameProvider>()
+                          .setSoundVolume(value / 100),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: OutlinedButton.icon(
+                        onPressed: () => AppAudio.instance.play(AppSound.uiTap),
+                        icon: const Icon(Icons.volume_up_outlined),
+                        label: const Text('Ses Örneğini Dinle'),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
               GlassCard(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,10 +159,12 @@ class _SettingsViewState extends State<SettingsView> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Mavishim 1.0.0',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.black54),
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                ),
               ),
             ],
           ),

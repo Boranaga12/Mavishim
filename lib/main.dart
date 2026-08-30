@@ -124,26 +124,69 @@ class MavishimApp extends StatelessWidget {
           create: (_) => TapEffectsProvider(repository, snapshot),
         ),
       ],
-      child: MaterialApp(
-        title: 'Mavishim',
-        debugShowCheckedModeBanner: false,
-        theme: AppTheme.lightTheme,
-        builder: (context, child) {
-          final mediaQuery = MediaQuery.of(context);
-          return MediaQuery(
-            data: mediaQuery.copyWith(
-              textScaler: mediaQuery.textScaler.clamp(
-                minScaleFactor: 1,
-                maxScaleFactor: 1.6,
+      // Only the theme flag needs to rebuild MaterialApp. Game scores and other
+      // progress updates then stay local to their own screens.
+      child: Selector<GameProvider, bool>(
+        selector: (_, gameProvider) => gameProvider.darkMode,
+        builder: (context, isDarkMode, _) => MaterialApp(
+          title: 'Mavishim',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          themeAnimationDuration: Duration.zero,
+          builder: (context, child) {
+            final mediaQuery = MediaQuery.of(context);
+            return MediaQuery(
+              data: mediaQuery.copyWith(
+                textScaler: mediaQuery.textScaler.clamp(
+                  minScaleFactor: 1,
+                  maxScaleFactor: 1.6,
+                ),
               ),
-            ),
-            child: MobileFrameWrapper(child: SecurityLockScreen(child: child!)),
-          );
-        },
-        localizationsDelegates: AppLocalizations.localizationsDelegates,
-        supportedLocales: AppLocalizations.supportedLocales,
-        locale: const Locale('tr'),
-        home: const MainNavigationView(),
+              child: MobileFrameWrapper(
+                child: SecurityLockScreen(
+                  child: Stack(
+                    children: [
+                      Positioned.fill(child: child!),
+                      Positioned(
+                        right: 6,
+                        top: 6,
+                        child: SafeArea(
+                          child: Material(
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.surface.withValues(alpha: .92),
+                            shape: const CircleBorder(),
+                            elevation: 3,
+                            child: Semantics(
+                              button: true,
+                              label: isDarkMode ? 'Gündüz modu' : 'Gece modu',
+                              child: IconButton(
+                                onPressed: () => context
+                                    .read<GameProvider>()
+                                    .toggleDarkMode(),
+                                icon: Icon(
+                                  isDarkMode
+                                      ? Icons.light_mode
+                                      : Icons.dark_mode,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          locale: const Locale('tr'),
+          home: const MainNavigationView(),
+        ),
       ),
     );
   }

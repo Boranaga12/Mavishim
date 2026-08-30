@@ -78,25 +78,28 @@ class _LoveNotesViewState extends State<LoveNotesView> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        decoration: AppTheme.pageBackground(context),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Sevgi Notları & Olumlamalar 💌',
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF331B29),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   'Sana özel hazırlanmış tatlı mesajlar.',
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade700),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
@@ -143,11 +146,11 @@ class _LoveNotesViewState extends State<LoveNotesView> {
                           child: Text(
                             '“ $_todaysNote ”',
                             textAlign: TextAlign.center,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
                               fontStyle: FontStyle.italic,
-                              color: Color(0xFF331B29),
+                              color: Theme.of(context).colorScheme.onSurface,
                               height: 1.4,
                             ),
                           ),
@@ -200,7 +203,7 @@ class _LoveNotesViewState extends State<LoveNotesView> {
                           ),
                         ),
                         const SizedBox(width: 14),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -210,7 +213,9 @@ class _LoveNotesViewState extends State<LoveNotesView> {
                                 style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
-                                  color: Color(0xFF331B29),
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurface,
                                 ),
                               ),
                               SizedBox(height: 4),
@@ -218,7 +223,9 @@ class _LoveNotesViewState extends State<LoveNotesView> {
                                 'Sen her halinle çok değerlisin ve mükemmelsin. Bugün kendine gülümsemeyi unutma! 😊💖',
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.black87,
+                                  color: Theme.of(
+                                    context,
+                                  ).colorScheme.onSurfaceVariant,
                                   height: 1.3,
                                 ),
                               ),

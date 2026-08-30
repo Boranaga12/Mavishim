@@ -22,7 +22,7 @@ class CycleDashboard extends StatelessWidget {
 
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        decoration: AppTheme.pageBackground(context),
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
@@ -182,10 +182,15 @@ class _Header extends StatelessWidget {
             ],
           ),
         ),
-        IconButton.filledTonal(
-          onPressed: onEmojiPressed,
-          tooltip: 'Günün emojisini seç',
-          icon: Text(emoji ?? '✨', style: const TextStyle(fontSize: 22)),
+        // The persistent theme control occupies the top-right corner.
+        // Reserve its touch area so the daily emoji button remains usable.
+        Padding(
+          padding: const EdgeInsets.only(right: 56),
+          child: IconButton.filledTonal(
+            onPressed: onEmojiPressed,
+            tooltip: 'Günün emojisini seç',
+            icon: Text(emoji ?? '✨', style: const TextStyle(fontSize: 22)),
+          ),
         ),
       ],
     );

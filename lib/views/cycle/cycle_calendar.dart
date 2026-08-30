@@ -37,7 +37,7 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
 
     return Scaffold(
       body: DecoratedBox(
-        decoration: const BoxDecoration(gradient: AppTheme.backgroundGradient),
+        decoration: AppTheme.pageBackground(context),
         child: SafeArea(
           child: ListView(
             padding: const EdgeInsets.fromLTRB(14, 10, 14, 24),
@@ -50,10 +50,13 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
-                  TextButton.icon(
-                    onPressed: _resetToToday,
-                    icon: const Icon(Icons.today),
-                    label: const Text('Bugün'),
+                  Padding(
+                    padding: const EdgeInsets.only(right: 56),
+                    child: TextButton.icon(
+                      onPressed: _resetToToday,
+                      icon: const Icon(Icons.today),
+                      label: const Text('Bugün'),
+                    ),
                   ),
                 ],
               ),

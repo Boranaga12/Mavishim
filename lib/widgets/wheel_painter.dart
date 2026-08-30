@@ -60,29 +60,38 @@ class WheelPainter extends CustomPainter {
   ) {
     final angle = startAngle + sweepAngle / 2;
     final position = Offset(
-      center.dx + radius * 0.62 * cos(angle),
-      center.dy + radius * 0.62 * sin(angle),
+      center.dx + radius * 0.67 * cos(angle),
+      center.dy + radius * 0.67 * sin(angle),
     );
-    final visibleLabel = label.length > 18
-        ? '${label.substring(0, 16)}…'
+    final maxCharacters = options.length > 18
+        ? 9
+        : options.length > 12
+        ? 12
+        : 16;
+    final visibleLabel = label.length > maxCharacters
+        ? '${label.substring(0, maxCharacters - 1)}…'
         : label;
     final painter = TextPainter(
       text: TextSpan(
         text: visibleLabel,
-        style: const TextStyle(
+        style: TextStyle(
           color: Colors.white,
-          fontSize: 11,
+          fontSize: options.length > 20
+              ? 7.5
+              : options.length > 14
+              ? 9
+              : 11,
           fontWeight: FontWeight.bold,
         ),
       ),
       textDirection: TextDirection.ltr,
       maxLines: 1,
-    )..layout(maxWidth: radius * 0.7);
+    )..layout(maxWidth: radius * 0.48);
 
     canvas
       ..save()
       ..translate(position.dx, position.dy)
-      ..rotate(angle + pi / 2);
+      ..rotate(angle);
     painter.paint(canvas, Offset(-painter.width / 2, -painter.height / 2));
     canvas.restore();
   }

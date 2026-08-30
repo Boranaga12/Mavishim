@@ -10,11 +10,13 @@ import '../providers/tap_effects_provider.dart';
 class TapEffectsLayer extends StatefulWidget {
   final Widget child;
   final String surfaceId;
+  final bool allowHeartPlacement;
 
   const TapEffectsLayer({
     super.key,
     required this.child,
     required this.surfaceId,
+    this.allowHeartPlacement = true,
   });
 
   @override
@@ -68,7 +70,7 @@ class _TapEffectsLayerState extends State<TapEffectsLayer>
     _lastTapAt = now;
     _lastTapPosition = position;
 
-    if (isDoubleTap) {
+    if (isDoubleTap && widget.allowHeartPlacement) {
       context.read<TapEffectsProvider>().toggleHeart(
         widget.surfaceId,
         position.dx / size.width,
@@ -123,13 +125,14 @@ class _TapEffectsLayerState extends State<TapEffectsLayer>
               fit: StackFit.expand,
               children: [
                 RepaintBoundary(child: widget.child),
-                IgnorePointer(
-                  child: _HeartOverlay(
-                    surfaceId: widget.surfaceId,
-                    size: size,
-                    scrollOffset: _scrollOffset,
+                if (widget.allowHeartPlacement)
+                  IgnorePointer(
+                    child: _HeartOverlay(
+                      surfaceId: widget.surfaceId,
+                      size: size,
+                      scrollOffset: _scrollOffset,
+                    ),
                   ),
-                ),
                 if (_bursts.isNotEmpty)
                   IgnorePointer(
                     child: RepaintBoundary(
