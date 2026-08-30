@@ -84,8 +84,20 @@ class _WordLevel {
   final List<String> words;
   const _WordLevel(this.letters, this.words);
 
+  List<String> get puzzleWords {
+    final result = words
+        .where((word) => _canBuildWord(letters, word))
+        .toSet()
+        .toList();
+    result.sort((a, b) {
+      final lengthOrder = b.length.compareTo(a.length);
+      return lengthOrder != 0 ? lengthOrder : a.compareTo(b);
+    });
+    return result;
+  }
+
   List<String> get allWords {
-    final result = <String>{...words};
+    final result = <String>{...puzzleWords};
     for (final candidate in _wordCandidates) {
       if (_canBuildWord(letters, candidate)) result.add(candidate);
     }
@@ -220,6 +232,223 @@ const _wordCandidates = <String>[
   'yaz',
   'yıldız',
   'yol',
+  'acı',
+  'acım',
+  'ah',
+  'ait',
+  'ama',
+  'amin',
+  'anı',
+  'ani',
+  'ant',
+  'arı',
+  'art',
+  'asım',
+  'asma',
+  'atma',
+  'baron',
+  'benim',
+  'bina',
+  'boran',
+  'ceb',
+  'cem',
+  'doğum',
+  'eğim',
+  'emin',
+  'emir',
+  'emel',
+  'empati',
+  'esin',
+  'evim',
+  'fes',
+  'film',
+  'gel',
+  'geli',
+  'gemi',
+  'geniş',
+  'gişe',
+  'ham',
+  'hata',
+  'istem',
+  'iş',
+  'işim',
+  'kaş',
+  'kaşım',
+  'kış',
+  'kışım',
+  'kum',
+  'lif',
+  'lig',
+  'malım',
+  'mar',
+  'mart',
+  'masa',
+  'matem',
+  'mate',
+  'maya',
+  'mesai',
+  'mest',
+  'meta',
+  'metin',
+  'mil',
+  'mine',
+  'mis',
+  'mod',
+  'mor',
+  'nam',
+  'nem',
+  'öbeğim',
+  'örüm',
+  'pas',
+  'pasta',
+  'pes',
+  'ram',
+  'rant',
+  'retina',
+  'roman',
+  'rum',
+  'sap',
+  'sat',
+  'satma',
+  'semt',
+  'sempati',
+  'set',
+  'sima',
+  'sim',
+  'simge',
+  'simli',
+  'sinem',
+  'sine',
+  'site',
+  'talim',
+  'tas',
+  'team',
+  'temas',
+  'tepsi',
+  'terim',
+  'tespit',
+  'tiner',
+  'tip',
+  'tim',
+  'tren',
+  'varım',
+  'veli',
+  'vur',
+  'yam',
+  'yama',
+  'yat',
+  'yatım',
+  'yıl',
+  'yılım',
+  'yum',
+  'çim',
+  'çiğ',
+  'akış',
+  'aşık',
+  'aşım',
+  'amber',
+  'amir',
+  'anemi',
+  'anime',
+  'antre',
+  'bant',
+  'barem',
+  'baret',
+  'barit',
+  'barmen',
+  'bateri',
+  'bent',
+  'berat',
+  'beta',
+  'betim',
+  'biat',
+  'bin',
+  'biner',
+  'bira',
+  'bit',
+  'bora',
+  'ebat',
+  'eğe',
+  'eğil',
+  'eğilme',
+  'eğitme',
+  'eğme',
+  'eman',
+  'emtia',
+  'enfes',
+  'ense',
+  'entari',
+  'erat',
+  'esef',
+  'esen',
+  'esim',
+  'esme',
+  'etap',
+  'etamin',
+  'etme',
+  'fiil',
+  'file',
+  'imge',
+  'imgeli',
+  'iman',
+  'imar',
+  'imaret',
+  'inat',
+  'inme',
+  'ispat',
+  'itaat',
+  'kam',
+  'kamış',
+  'lime',
+  'lise',
+  'mabet',
+  'mahya',
+  'mani',
+  'matine',
+  'melek',
+  'meşin',
+  'minare',
+  'minber',
+  'namert',
+  'nebat',
+  'nefis',
+  'nimet',
+  'norm',
+  'oba',
+  'onar',
+  'onarım',
+  'orman',
+  'pest',
+  'pim',
+  'pis',
+  'pist',
+  'puf',
+  'saat',
+  'sapa',
+  'sapma',
+  'sema',
+  'semai',
+  'sene',
+  'sevi',
+  'sevim',
+  'sevimli',
+  'silgi',
+  'silme',
+  'sitem',
+  'step',
+  'tabir',
+  'tamir',
+  'tapa',
+  'tapma',
+  'tasma',
+  'tatma',
+  'temin',
+  'tepme',
+  'test',
+  'testi',
+  'vurma',
+  'yuva',
+  'yuvar',
   'anım',
   'alım',
   'akım',
@@ -252,30 +481,187 @@ const _wordCandidates = <String>[
 ];
 
 const _wordLevels = <_WordLevel>[
-  _WordLevel('BORANIM', ['boranım', 'anım', 'oran']),
-  _WordLevel('ELİFİM', ['elifim', 'ilim', 'fil']),
+  _WordLevel('BORANIM', [
+    'boranım',
+    'boran',
+    'baron',
+    'roman',
+    'anım',
+    'oran',
+    'bar',
+    'bor',
+    'nar',
+    'mor',
+    'ram',
+    'nam',
+    'anı',
+    'arı',
+  ]),
+  _WordLevel('ELİFİM', [
+    'elifim',
+    'ilim',
+    'elim',
+    'film',
+    'fil',
+    'mil',
+    'lif',
+    'il',
+    'el',
+  ]),
   _WordLevel('GUBUŞUM', ['gubuşum', 'gubuş', 'muş']),
-  _WordLevel('CANIM', ['canım', 'anım', 'can']),
+  _WordLevel('CANIM', [
+    'canım',
+    'anım',
+    'acım',
+    'can',
+    'cam',
+    'acı',
+    'anı',
+    'nam',
+  ]),
   _WordLevel('CİCİM', ['cicim', 'cici']),
-  _WordLevel('SEVGİLİM', ['sevgilim', 'sevgi', 'ilgi']),
-  _WordLevel('AŞKIM', ['aşkım', 'aşk', 'akım']),
-  _WordLevel('ÖMRÜM', ['ömrüm', 'ömür']),
-  _WordLevel('BİRTANEM', ['birtanem', 'bir', 'tane']),
-  _WordLevel('HAYATIM', ['hayatım', 'hayat', 'hat']),
-  _WordLevel('BALIM', ['balım', 'bal', 'alım']),
-  _WordLevel('PETEĞİM', ['peteğim', 'tepe']),
-  _WordLevel('POFUDUĞUM', ['pofuduğum']),
-  _WordLevel('PATATESİM', ['patatesim', 'patates', 'pati']),
-  _WordLevel('ÇİÇEĞİM', ['çiçeğim', 'çiçek', 'içim']),
-  _WordLevel('BÖCEĞİM', ['böceğim']),
+  _WordLevel('SEVGİLİM', [
+    'sevgilim',
+    'sevgi',
+    'sevgim',
+    'simge',
+    'ilgim',
+    'ilgi',
+    'simli',
+    'gemi',
+    'evim',
+    'elim',
+    'isim',
+    'veli',
+    'silgi',
+    'gel',
+    'sil',
+    'mil',
+    'mis',
+    'sim',
+  ]),
+  _WordLevel('AŞKIM', [
+    'aşkım',
+    'kaşım',
+    'kışım',
+    'aşk',
+    'akım',
+    'kaş',
+    'kış',
+    'ak',
+    'aş',
+  ]),
+  _WordLevel('ÖMRÜM', ['ömrüm', 'ömür', 'örüm']),
+  _WordLevel('BİRTANEM', [
+    'birtanem',
+    'retina',
+    'metin',
+    'tiner',
+    'benim',
+    'terim',
+    'emir',
+    'emin',
+    'mert',
+    'tren',
+    'mera',
+    'bir',
+    'tane',
+    'ant',
+    'art',
+    'ait',
+    'nem',
+    'net',
+    'ten',
+    'ter',
+    'tam',
+  ]),
+  _WordLevel('HAYATIM', [
+    'hayatım',
+    'hayat',
+    'yatım',
+    'hata',
+    'maya',
+    'yama',
+    'asma',
+    'atma',
+    'satma',
+    'hat',
+    'yat',
+    'yam',
+    'ham',
+    'tam',
+    'mat',
+    'ama',
+  ]),
+  _WordLevel('BALIM', ['balım', 'malım', 'alım', 'bal', 'mal']),
+  _WordLevel('PETEĞİM', ['peteğim', 'eğim', 'tepe', 'tip', 'tim', 'pet']),
+  _WordLevel('POFUDUĞUM', ['pofuduğum', 'doğum', 'mod', 'of', 'uf']),
+  _WordLevel('PATATESİM', [
+    'patatesim',
+    'patates',
+    'sempati',
+    'empati',
+    'tespit',
+    'mesai',
+    'tepsi',
+    'temas',
+    'pasta',
+    'satma',
+    'atma',
+    'istem',
+    'mesai',
+    'masa',
+    'asma',
+    'sima',
+    'site',
+    'sitem',
+    'testi',
+  ]),
+  _WordLevel('ÇİÇEĞİM', ['çiçeğim', 'içim', 'eğim', 'çiğ', 'çim', 'iç']),
+  _WordLevel('BÖCEĞİM', ['böceğim', 'öbeğim', 'eğim', 'cem', 'ceb']),
   _WordLevel('KUŞUM', ['kuşum', 'kuş']),
   _WordLevel('GÜLÜM', ['gülüm', 'gül']),
   _WordLevel('YAVRUM', ['yavrum', 'yavru']),
   _WordLevel('RUHUM', ['ruhum', 'ruh']),
-  _WordLevel('MELEĞİM', ['meleğim']),
-  _WordLevel('GÜNEŞİM', ['güneşim', 'güneş', 'eşim']),
-  _WordLevel('YILDIZIM', ['yıldızım', 'yıldız']),
-  _WordLevel('NEFESİM', ['nefesim', 'nefes']),
+  _WordLevel('MELEĞİM', [
+    'meleğim',
+    'emel',
+    'elim',
+    'eğim',
+    'mil',
+    'ile',
+    'el',
+  ]),
+  _WordLevel('GÜNEŞİM', [
+    'güneşim',
+    'güneş',
+    'geniş',
+    'eşim',
+    'işim',
+    'gemi',
+    'gişe',
+    'menü',
+    'gün',
+    'nem',
+    'iş',
+    'eş',
+  ]),
+  _WordLevel('YILDIZIM', ['yıldızım', 'yıldız', 'yılım', 'yıl']),
+  _WordLevel('NEFESİM', [
+    'nefesim',
+    'nefes',
+    'sinem',
+    'esin',
+    'emin',
+    'mine',
+    'sine',
+    'nem',
+    'sen',
+    'ses',
+    'fes',
+    'mis',
+    'sim',
+  ]),
 ];
 
 enum CuteArcadeGame {
@@ -389,6 +775,7 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
   final Set<String> _foundWords = {};
   List<String> _wordLetters = [];
   Offset? _wordPointer;
+  _WordCrossword? _wordCrossword;
   String _reactionButtonText = 'Boranını seviyor musun?';
   String _reactionFeedback = '';
 
@@ -541,9 +928,14 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
         }
       case CuteArcadeGame.wordHunt:
         _target = _random.nextInt(_wordLevels.length);
-        _wordLetters = _wordLevels[_target].letters.split('')..shuffle(_random);
+        final level = _wordLevels[_target];
+        _wordLetters = level.letters.split('')..shuffle(_random);
         _wordSelected.clear();
         _foundWords.clear();
+        _wordCrossword = _WordCrossword.generate(
+          level.puzzleWords,
+          seed: _target * 7919 + level.puzzleWords.length,
+        );
       case CuteArcadeGame.reaction:
         _reactionButtonText = 'Boranını seviyor musun?';
         _scheduleReaction();
@@ -758,11 +1150,16 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
         .replaceAll('İ', 'i')
         .toLowerCase();
     final level = _wordLevels[_target];
-    final words = level.allWords;
-    if (words.contains(word)) {
-      _foundWords.add(word);
-      _persistScore(_score + 1);
-      if (_foundWords.length == words.length) {
+    if (level.allWords.contains(word)) {
+      if (!_foundWords.add(word)) {
+        _message = '“$word” kelimesini zaten buldun.';
+      } else {
+        _message = level.puzzleWords.contains(word)
+            ? 'Harika! “$word” şemada açıldı.'
+            : 'Bonus kelime: “$word” ✨';
+        _persistScore(_score + 1);
+      }
+      if (level.puzzleWords.every(_foundWords.contains)) {
         _ended = true;
         _showResult('Bölüm tamamlandı!');
       }
@@ -1259,56 +1656,39 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
 
   Widget _wordHunt() {
     final level = _wordLevels[_target];
-    final words = level.allWords;
+    final words = level.puzzleWords;
     final letters = _wordLetters;
     final current = _wordSelected.map((index) => letters[index]).join();
+    final crossword = _wordCrossword!;
+    final foundInPuzzle = words.where(_foundWords.contains).length;
+    final bonusCount = _foundWords.length - foundInPuzzle;
     return Column(
       children: [
+        Text(
+          '${level.letters} • $foundInPuzzle/${words.length} kelime${bonusCount == 0 ? '' : ' • $bonusCount bonus'}',
+          style: const TextStyle(fontWeight: FontWeight.w800),
+        ),
+        const SizedBox(height: 6),
         Expanded(
-          child: SingleChildScrollView(
-            child: Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              alignment: WrapAlignment.center,
-              children: words
-                  .map(
-                    (word) => Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 8,
-                      ),
-                      decoration: BoxDecoration(
-                        color: _foundWords.contains(word)
-                            ? Colors.green.shade100
-                            : _nightMode
-                            ? const Color(0xFF27364B)
-                            : Colors.white,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        _foundWords.contains(word)
-                            ? word.toUpperCase()
-                            : List.filled(word.length, '□').join(' '),
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  )
-                  .toList(),
-            ),
+          child: _WordCrosswordBoard(
+            crossword: crossword,
+            foundWords: _foundWords,
+            nightMode: _nightMode,
           ),
         ),
+        const SizedBox(height: 6),
         Text(
-          current,
+          current.isEmpty ? 'Harfleri sürükleyerek birleştir aşkım' : current,
           style: const TextStyle(
-            fontSize: 22,
+            fontSize: 20,
             color: AppTheme.primaryPink,
             fontWeight: FontWeight.bold,
           ),
         ),
         Center(
           child: SizedBox(
-            width: 250,
-            height: 250,
+            width: 220,
+            height: 220,
             child: LayoutBuilder(
               builder: (_, box) {
                 final center = Offset(box.maxWidth / 2, box.maxHeight / 2);
@@ -1857,6 +2237,260 @@ class _MazeBoardPainter extends CustomPainter {
       oldDelegate.side != side ||
       oldDelegate.passages != passages ||
       oldDelegate.reuniting != reuniting;
+}
+
+typedef _WordCell = (int, int);
+
+class _WordPlacement {
+  final String word;
+  final int row;
+  final int column;
+  final bool horizontal;
+
+  const _WordPlacement({
+    required this.word,
+    required this.row,
+    required this.column,
+    required this.horizontal,
+  });
+
+  Iterable<_WordCell> get cells sync* {
+    for (var index = 0; index < word.length; index++) {
+      yield (row + (horizontal ? 0 : index), column + (horizontal ? index : 0));
+    }
+  }
+}
+
+class _WordCrossword {
+  final Map<_WordCell, String> cells;
+  final Map<_WordCell, Set<String>> cellWords;
+  final int minRow;
+  final int maxRow;
+  final int minColumn;
+  final int maxColumn;
+
+  const _WordCrossword({
+    required this.cells,
+    required this.cellWords,
+    required this.minRow,
+    required this.maxRow,
+    required this.minColumn,
+    required this.maxColumn,
+  });
+
+  int get rows => maxRow - minRow + 1;
+  int get columns => maxColumn - minColumn + 1;
+
+  static _WordCrossword generate(List<String> source, {required int seed}) {
+    final random = Random(seed);
+    final words = source.toSet().toList()..shuffle(random);
+    words.sort((a, b) => b.length.compareTo(a.length));
+    final cells = <_WordCell, String>{};
+    final placements = <_WordPlacement>[];
+
+    void place(_WordPlacement placement) {
+      placements.add(placement);
+      var index = 0;
+      for (final cell in placement.cells) {
+        cells[cell] = placement.word[index++];
+      }
+    }
+
+    if (words.isEmpty) {
+      return const _WordCrossword(
+        cells: {},
+        cellWords: {},
+        minRow: 0,
+        maxRow: 0,
+        minColumn: 0,
+        maxColumn: 0,
+      );
+    }
+    place(
+      _WordPlacement(
+        word: words.removeAt(0),
+        row: 0,
+        column: 0,
+        horizontal: true,
+      ),
+    );
+
+    final pending = List<String>.from(words);
+    while (pending.isNotEmpty) {
+      var addedInPass = false;
+      for (final word in List<String>.from(pending)) {
+        final candidate = _bestPlacement(word, cells, strict: true);
+        if (candidate == null) continue;
+        place(candidate);
+        pending.remove(word);
+        addedInPass = true;
+      }
+      if (addedInPass) continue;
+
+      // Dense levels can run out of strict crossword spacing. Keep the board
+      // connected while relaxing only the side-neighbour rule.
+      final word = pending.removeAt(0);
+      final relaxed = _bestPlacement(word, cells, strict: false);
+      if (relaxed != null) {
+        place(relaxed);
+      } else {
+        final bottom = cells.keys.map((cell) => cell.$1).reduce(max) + 2;
+        place(
+          _WordPlacement(word: word, row: bottom, column: 0, horizontal: true),
+        );
+      }
+    }
+
+    final cellWords = <_WordCell, Set<String>>{};
+    for (final placement in placements) {
+      for (final cell in placement.cells) {
+        (cellWords[cell] ??= <String>{}).add(placement.word);
+      }
+    }
+    final rows = cells.keys.map((cell) => cell.$1);
+    final columns = cells.keys.map((cell) => cell.$2);
+    return _WordCrossword(
+      cells: cells,
+      cellWords: cellWords,
+      minRow: rows.reduce(min),
+      maxRow: rows.reduce(max),
+      minColumn: columns.reduce(min),
+      maxColumn: columns.reduce(max),
+    );
+  }
+
+  static _WordPlacement? _bestPlacement(
+    String word,
+    Map<_WordCell, String> cells, {
+    required bool strict,
+  }) {
+    _WordPlacement? best;
+    var bestScore = -1 << 30;
+    for (var letterIndex = 0; letterIndex < word.length; letterIndex++) {
+      for (final entry in cells.entries) {
+        if (entry.value != word[letterIndex]) continue;
+        for (final horizontal in [true, false]) {
+          final placement = _WordPlacement(
+            word: word,
+            row: entry.key.$1 - (horizontal ? 0 : letterIndex),
+            column: entry.key.$2 - (horizontal ? letterIndex : 0),
+            horizontal: horizontal,
+          );
+          final score = _placementScore(placement, cells, strict: strict);
+          if (score == null || score <= bestScore) continue;
+          best = placement;
+          bestScore = score;
+        }
+      }
+    }
+    return best;
+  }
+
+  static int? _placementScore(
+    _WordPlacement placement,
+    Map<_WordCell, String> cells, {
+    required bool strict,
+  }) {
+    final before = (
+      placement.row - (placement.horizontal ? 0 : 1),
+      placement.column - (placement.horizontal ? 1 : 0),
+    );
+    final after = (
+      placement.row + (placement.horizontal ? 0 : placement.word.length),
+      placement.column + (placement.horizontal ? placement.word.length : 0),
+    );
+    if (cells.containsKey(before) || cells.containsKey(after)) return null;
+
+    var intersections = 0;
+    var index = 0;
+    for (final cell in placement.cells) {
+      final existing = cells[cell];
+      if (existing != null && existing != placement.word[index]) return null;
+      if (existing != null) {
+        intersections++;
+      } else if (strict) {
+        final neighbours = placement.horizontal
+            ? <_WordCell>[(cell.$1 - 1, cell.$2), (cell.$1 + 1, cell.$2)]
+            : <_WordCell>[(cell.$1, cell.$2 - 1), (cell.$1, cell.$2 + 1)];
+        if (neighbours.any(cells.containsKey)) return null;
+      }
+      index++;
+    }
+    if (intersections == 0) return null;
+    final distance = placement.row.abs() + placement.column.abs();
+    return intersections * 1000 - distance * 3;
+  }
+}
+
+class _WordCrosswordBoard extends StatelessWidget {
+  final _WordCrossword crossword;
+  final Set<String> foundWords;
+  final bool nightMode;
+
+  const _WordCrosswordBoard({
+    required this.crossword,
+    required this.foundWords,
+    required this.nightMode,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    const cellSize = 31.0;
+    return Center(
+      child: FittedBox(
+        fit: BoxFit.contain,
+        child: SizedBox(
+          width: crossword.columns * cellSize,
+          height: crossword.rows * cellSize,
+          child: Stack(
+            children: crossword.cells.entries.map((entry) {
+              final related = crossword.cellWords[entry.key] ?? const {};
+              final revealed = related.any(foundWords.contains);
+              return Positioned(
+                left: (entry.key.$2 - crossword.minColumn) * cellSize,
+                top: (entry.key.$1 - crossword.minRow) * cellSize,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 220),
+                  width: cellSize - 2,
+                  height: cellSize - 2,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: revealed
+                        ? AppTheme.primaryPink
+                        : nightMode
+                        ? const Color(0xFF33445E)
+                        : Colors.white,
+                    borderRadius: BorderRadius.circular(5),
+                    border: Border.all(
+                      color: revealed
+                          ? AppTheme.primaryPink
+                          : const Color(0xFF8FA9D8),
+                    ),
+                    boxShadow: const [
+                      BoxShadow(color: Color(0x22000000), blurRadius: 2),
+                    ],
+                  ),
+                  child: Text(
+                    revealed
+                        ? entry.value
+                              .replaceAll('i', 'İ')
+                              .replaceAll('ı', 'I')
+                              .toUpperCase()
+                        : '',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w900,
+                      fontSize: 17,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class _LetterWheelPainter extends CustomPainter {

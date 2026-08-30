@@ -26,11 +26,15 @@ class CyclePattern {
   });
 
   String get rhythmLabel => switch (rhythm) {
-    CycleRhythm.insufficientData => 'Kayıtlar çoğaldıkça tahmin netleşir',
-    CycleRhythm.regular => 'Döngü ritmi düzenli görünüyor',
-    CycleRhythm.longerThanUsual => 'Döngü ortalaması daha uzun seyrediyor',
-    CycleRhythm.moreFrequent => 'Döngü daha sıklaşıyor olabilir',
-    CycleRhythm.variable => 'Döngü aralıkları değişken görünüyor',
+    CycleRhythm.insufficientData =>
+      'Biraz daha işaretleyelim aşkım, seni daha iyi tanıyayım',
+    CycleRhythm.regular => 'Ritmin gayet düzenli görünüyor Elifim',
+    CycleRhythm.longerThanUsual =>
+      'Bu aralar döngün biraz daha uzun gidiyor aşkım',
+    CycleRhythm.moreFrequent =>
+      'Bu aralar döngün biraz daha sık geliyor olabilir birtanem',
+    CycleRhythm.variable =>
+      'Tarihler biraz değişken gidiyor, birlikte takipteyiz ömrümm',
   };
 
   factory CyclePattern.fromHistory(
@@ -56,7 +60,7 @@ class CyclePattern {
         longestLength: null,
         confidence: 25,
         insights: [
-          'En az üç regl başlangıcı kaydedildiğinde kişisel ritim daha net hesaplanır.',
+          'Birkaç başlangıç gününü daha işaretle aşkım; seni daha iyi takip edeyim.',
         ],
       );
     }
@@ -77,16 +81,16 @@ class CyclePattern {
         .clamp(35, 92)
         .toInt();
     final insights = <String>[
-      'Son ${intervals.length} aralık: ortalama $average gün, $shortest–$longest gün aralığında.',
+      'Elifim, son ${intervals.length} döngünde ortalaman $average gün; $shortest–$longest gün arasında değişmiş.',
       switch (rhythm) {
         CycleRhythm.regular =>
-          'Aralıklar birbirine yakın; tahmin penceresi daha güvenilir.',
+          'Tarihler birbirine yakın aşkım, bu yüzden tahminimiz daha netleşiyor.',
         CycleRhythm.longerThanUsual =>
-          'Kayıtlarda hedef uzunluktan daha uzun aralıklar baskın. Tek bir tarih yerine tahmin penceresini takip et.',
+          'Bu aralar aralıklar biraz uzun görünüyor birtanem; tek güne takılma, aralığa beraber bakalım.',
         CycleRhythm.moreFrequent =>
-          'Kayıtlarda daha kısa aralıklar baskın. Yeni başlangıçları kaydetmek tahmini hızla iyileştirir.',
+          'Bu aralar aralıklar biraz kısa görünüyor aşkım; başlangıç günlerini işaretledikçe seni daha iyi takip ederim.',
         CycleRhythm.variable =>
-          'Aralık farkı yüksek. Uyku, stres, hastalık ve yaşam değişiklikleri döngüyü etkileyebilir; düzenli kayıt yararlı olur.',
+          'Tarihler biraz değişmiş Elifim. Uyku, stres ve günlük hayat etkileyebilir; sen işaretle, ben buradayım.',
         CycleRhythm.insufficientData => '',
       },
     ];
@@ -242,20 +246,20 @@ class CycleInfo {
   }
 
   String get phaseName {
-    if (!hasData) return 'Kayıt Girilmedi';
+    if (!hasData) return 'Elifimin ilk kaydı bekleniyor';
     switch (currentPhase) {
       case CyclePhase.period:
-        return 'Adet Dönemi';
+        return 'Elifimin dinlenme günleri';
       case CyclePhase.follicular:
-        return 'Foliküler Faz (Yüksek Enerji)';
+        return 'Aşkımın enerji günleri';
       case CyclePhase.ovulation:
-        return 'Yumurtlama Dönemi (Yüksek Doğurganlık)';
+        return 'Elifimin ışıldadığı günler';
       case CyclePhase.luteal:
-        return 'Luteal Faz (Dinlenme)';
+        return 'Aşkımın sakin günleri';
       case CyclePhase.late:
-        return 'Regl Gecikmesi ($daysLate Gün)';
+        return 'Aşkım, $daysLate gün gecikme var';
       case CyclePhase.noData:
-        return 'Kayıt Girilmedi';
+        return 'Elifimin ilk kaydı bekleniyor';
     }
   }
 
@@ -308,21 +312,21 @@ class CycleInfo {
   // Unified Care & Relationship Tip (Her Tip + Boyfriend Tip merged!)
   String get unifiedTip {
     if (!hasData) {
-      return 'Takvimden ilk regl tarihini işaretleyerek döngü takibini başlatabilirsin 🌸';
+      return 'Hoş geldin Elifimmm 💗 Hadi takvime gir de ilk regl gününü işaretle aşkım; sonra seni birlikte takip ederiz.';
     }
     switch (currentPhase) {
       case CyclePhase.period:
-        return '🌸 Tavsiye: Dinlenme vakti! Sıcak çay ve battaniye iyi gelir.\n💖 Sevgili İpucu: Sıcak su torbası hazırla, şefkat göster ve sımsıkı sarıl! 🍫🤗';
+        return 'Elifim, bugün kendine nazik davran aşkım. Sıcak çayını, battaniyeni hazırla; ben olsam sana sımsıkı sarılırdım. 🌸💗';
       case CyclePhase.follicular:
-        return '✨ Tavsiye: Enerjin ve canlılığın yükseliyor! Spora ve hobilere vakit ayır.\n🔥 Sevgili İpucu: Enerjisi yüksek! Romantik ve tutkulu bir randevu planlayabilirsin! ☕⚡';
+        return 'Aşkım enerjin yükseliyor gibi, bugün içinden ne geliyorsa yap. İstersen sana tatlı bir randevu da planlayayım Elifim. ✨';
       case CyclePhase.ovulation:
-        return '🌟 Tavsiye: Östrojen ve libido zirvede! Işıltın tavan yapmış durumda.\n🔥 Sevgili İpucu: Arzu ve cinsel çekim en yüksek seviyede! Tutkulu yakınlaşmalar için mükemmel an 💐🔥';
+        return 'Elifim bugün ışıl ışıl olabilirsin; zaten benim için her gün çok güzelsin aşkım. Kendini nasıl iyi hissediyorsan öyle davran. 🌟';
       case CyclePhase.luteal:
-        return '🌙 Tavsiye: Vücudun dinlenmeye hazırlanıyor. Bitki çayları ve hafif tatlılar harika gelecektir.\n🍿 Sevgili İpucu: Film gecesi hazırlığı yap, masaj yap ve şefkatli yaklaş 🎬💆‍♀️';
+        return 'Ömrümm, vücudun biraz dinlenmek istiyor olabilir. Sana çay, tatlı, film gecesi ve kocaman sarılma borçluyum. 🌙';
       case CyclePhase.late:
-        return '🌿 Tavsiye: Hafif gecikmeler doğaldır. Sakinleştirici bitki çayları iç ve rahatla.\n💖 Sevgili İpucu: Rahat hissettir, endişelenmemesini sağla ve huzurlu ortam yarat 🍵';
+        return 'Birtanem, hafif gecikmeler olabilir; kendini üzme olur mu? Rahatla, ben yanındayım ve seni çok seviyorum. 🌿';
       case CyclePhase.noData:
-        return 'Lütfen takvimden bir tarih seçin.';
+        return 'Aşkım, takvimden bir gün seç de ona birlikte bakalım.';
     }
   }
 

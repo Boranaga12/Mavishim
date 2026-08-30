@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -12,26 +14,48 @@ class SecurityLockScreen extends StatefulWidget {
 
 class _SecurityLockScreenState extends State<SecurityLockScreen>
     with WidgetsBindingObserver {
+  // Sağ, sağ, sol, sol, sağ, sağ, sağ, sol.
+  static const _unlockSequence = <bool>[
+    true,
+    true,
+    false,
+    false,
+    true,
+    true,
+    true,
+    false,
+  ];
+  static const _maxInputGap = Duration(seconds: 2);
+  static const _lockoutDuration = Duration(seconds: 15);
+  static const _maxFailedAttempts = 4;
+
   bool _isUnlocked = false;
-  int _rightCount = 0;
-  int _leftCount = 0;
-  int _phase = 0;
+  int _sequenceIndex = 0;
+  int _failedAttempts = 0;
+  DateTime? _lastInputAt;
+  DateTime? _lockedUntil;
+  Timer? _lockoutTimer;
+  final FocusNode _lockFocusNode = FocusNode(debugLabel: 'security-lock');
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _requestLockFocus());
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
+    _lockoutTimer?.cancel();
+    _lockFocusNode.dispose();
     super.dispose();
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed || !_isUnlocked || !mounted) return;
+    if (state == AppLifecycleState.resumed || !mounted) return;
+    // Also lock during `inactive`, before the app-switcher preview is made.
     setState(_lock);
   }
 
@@ -39,26 +63,29 @@ class _SecurityLockScreenState extends State<SecurityLockScreen>
     if (!_isUnlocked) _handleSide(details.localPosition.dx >= width / 2);
   }
 
-  void _handleSide(bool right) {
+  void _handleSide(bool isRight) {
     if (_isUnlocked) return;
-    if (right) {
-      if (_phase == 0) {
-        _rightCount++;
-        if (_rightCount >= 2) _phase = 1;
-      } else if (_leftCount == 0) {
-        _rightCount++;
-      } else if (_leftCount >= 2) {
-        setState(() {
-          _isUnlocked = true;
-          _resetLock();
-        });
-      } else {
-        _resetLock(startWithRight: true);
-      }
-    } else if (_phase == 1 && _rightCount >= 2) {
-      _leftCount++;
-    } else {
-      _resetLock();
+    final now = DateTime.now();
+    final until = _lockedUntil;
+    if (until != null && now.isBefore(until)) return;
+    if (_lastInputAt != null && now.difference(_lastInputAt!) > _maxInputGap) {
+      _clearEntry();
+    }
+    _lastInputAt = now;
+
+    if (isRight != _unlockSequence[_sequenceIndex]) {
+      _registerFailedAttempt();
+      return;
+    }
+
+    _sequenceIndex++;
+    _failedAttempts = 0;
+    if (_sequenceIndex == _unlockSequence.length) {
+      setState(() {
+        _isUnlocked = true;
+        _clearEntry();
+      });
+      _lockFocusNode.unfocus();
     }
   }
 
@@ -77,13 +104,35 @@ class _SecurityLockScreenState extends State<SecurityLockScreen>
 
   void _lock() {
     _isUnlocked = false;
-    _resetLock();
+    _clearEntry();
+    _requestLockFocus();
   }
 
-  void _resetLock({bool startWithRight = false}) {
-    _rightCount = startWithRight ? 1 : 0;
-    _leftCount = 0;
-    _phase = 0;
+  void _clearEntry() {
+    _sequenceIndex = 0;
+    _lastInputAt = null;
+  }
+
+  void _registerFailedAttempt() {
+    _clearEntry();
+    _failedAttempts++;
+    if (_failedAttempts < _maxFailedAttempts) return;
+
+    _failedAttempts = 0;
+    _lockedUntil = DateTime.now().add(_lockoutDuration);
+    _lockoutTimer?.cancel();
+    _lockoutTimer = Timer(_lockoutDuration, () {
+      if (!mounted) return;
+      setState(() => _lockedUntil = null);
+      _requestLockFocus();
+    });
+  }
+
+  void _requestLockFocus() {
+    if (!mounted || _isUnlocked) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted && !_isUnlocked) _lockFocusNode.requestFocus();
+    });
   }
 
   @override
@@ -91,9 +140,6 @@ class _SecurityLockScreenState extends State<SecurityLockScreen>
     return Stack(
       fit: StackFit.expand,
       children: [
-        // Keep the navigator laid out behind the opaque lock so unlocking does
-        // not trigger an expensive full-tree layout. Input, semantics and
-        // tickers remain disabled while the black lock is visible.
         IgnorePointer(
           ignoring: !_isUnlocked,
           child: ExcludeSemantics(
@@ -110,7 +156,7 @@ class _SecurityLockScreenState extends State<SecurityLockScreen>
                   label: 'Gizli kilit ekranı',
                   hint: 'Tanımlı dokunma veya yön tuşu dizisini girin.',
                   child: Focus(
-                    autofocus: true,
+                    focusNode: _lockFocusNode,
                     onKeyEvent: _handleKeyEvent,
                     child: GestureDetector(
                       behavior: HitTestBehavior.opaque,

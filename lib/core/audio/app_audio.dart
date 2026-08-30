@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/services.dart';
 
 /// Named sound groups used throughout the app.
 ///
@@ -43,6 +44,7 @@ class AppAudio {
 
   static final AppAudio instance = AppAudio._();
   final Random _random = Random();
+  final Map<String, bool> _assetAvailability = {};
   AudioPlayer? _musicPlayer;
 
   double _volume = .8;
@@ -59,19 +61,24 @@ class AppAudio {
     }
   }
 
-  /// Plays a random variant: `ui_tap_01.mp3` through `ui_tap_03.mp3`.
-  Future<void> play(AppSound sound) => _playOneShot(_variantPath(sound.stem));
+  /// Plays a random available variant such as `ui_tap_01.mp3`.
+  Future<void> play(AppSound sound) async {
+    final path = await _availableVariantPath(sound.stem);
+    if (path != null) await _playOneShot(path);
+  }
 
   /// Starts a looping random music variation. It is opt-in because browsers
   /// block autoplay before a user interaction.
   Future<void> playMusic(AppMusic music) async {
     if (_volume == 0 || _activeMusic == music) return;
+    final path = await _availableVariantPath(music.stem);
+    if (path == null) return;
     _activeMusic = music;
     try {
       final player = _musicPlayer ??= AudioPlayer();
       await player.stop();
       await player.setReleaseMode(ReleaseMode.loop);
-      await player.play(AssetSource(_variantPath(music.stem)), volume: _volume);
+      await player.play(AssetSource(path), volume: _volume);
     } catch (_) {
       _activeMusic = null;
     }
@@ -89,8 +96,26 @@ class AppAudio {
     _musicPlayer = null;
   }
 
-  String _variantPath(String stem) =>
-      'audio/${stem}_${(_random.nextInt(3) + 1).toString().padLeft(2, '0')}.mp3';
+  Future<String?> _availableVariantPath(String stem) async {
+    final candidates = List<int>.generate(3, (index) => index + 1)
+      ..shuffle(_random);
+    for (final variant in candidates) {
+      final path = 'audio/${stem}_${variant.toString().padLeft(2, '0')}.mp3';
+      if (await _hasAsset(path)) return path;
+    }
+    return null;
+  }
+
+  Future<bool> _hasAsset(String path) async {
+    final cached = _assetAvailability[path];
+    if (cached != null) return cached;
+    try {
+      await rootBundle.load('assets/$path');
+      return _assetAvailability[path] = true;
+    } catch (_) {
+      return _assetAvailability[path] = false;
+    }
+  }
 
   Future<void> _playOneShot(String path) async {
     if (_volume == 0) return;

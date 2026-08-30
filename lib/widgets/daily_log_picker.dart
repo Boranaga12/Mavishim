@@ -83,7 +83,7 @@ abstract final class DailyLogPicker {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Günün Emojisi',
+                'Bugün nasıl bir gündü aşkım?',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 12),
@@ -93,9 +93,9 @@ abstract final class DailyLogPicker {
                 maxLength: 12,
                 inputFormatters: [_EmojiOnlyFormatter()],
                 decoration: const InputDecoration(
-                  labelText: 'Klavye ile emoji ekle',
+                  labelText: 'Bir emoji bırak bana Elifim',
                   hintText: 'Örn. 💙✨🌙',
-                  helperText: 'Yalnızca emoji kabul edilir.',
+                  helperText: 'Bunu görünce seni hatırlayayım aşkım.',
                 ),
                 onSubmitted: (_) => _saveKeyboardEmoji(
                   sheetContext,
@@ -114,12 +114,12 @@ abstract final class DailyLogPicker {
                     current,
                     controller.text,
                   ),
-                  child: const Text('Emojiyi Kaydet'),
+                  child: const Text('Bana Kaydet'),
                 ),
               ),
               const SizedBox(height: 12),
               Text(
-                'Hızlı seçimler',
+                'Kalbinden seç birtanem',
                 style: Theme.of(context).textTheme.labelLarge,
               ),
               const SizedBox(height: 8),
@@ -160,7 +160,7 @@ abstract final class DailyLogPicker {
                     if (sheetContext.mounted) Navigator.pop(sheetContext);
                   },
                   icon: const Icon(Icons.clear),
-                  label: const Text('Emojiyi Temizle'),
+                  label: const Text('Emojiyi Kaldır'),
                 ),
             ],
           ),
@@ -193,7 +193,7 @@ abstract final class DailyLogPicker {
     final current = provider.getLogForDate(date);
     await _showChoiceSheet(
       context: context,
-      title: 'Günlük Mod',
+      title: 'Bugün nasıl hissediyorsun aşkım?',
       values: moods,
       selectedValue: current.mood,
       onSelected: (value) =>
@@ -232,7 +232,7 @@ abstract final class DailyLogPicker {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Günlük İstek',
+                    'Bugün ne hissediyorsun Elifim?',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: 12),
@@ -311,7 +311,7 @@ abstract final class DailyLogPicker {
                       const Spacer(),
                       FilledButton(
                         onPressed: () => Navigator.pop(sheetContext),
-                        child: const Text('Tamam'),
+                        child: const Text('Tamam Aşkım'),
                       ),
                     ],
                   ),

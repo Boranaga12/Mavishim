@@ -77,7 +77,7 @@ class CycleDashboard extends StatelessWidget {
                   final cards = [
                     _LogCard(
                       title: 'Günlük Mod',
-                      value: log.mood ?? 'Seçim yap',
+                      value: log.mood ?? 'Bugün nasılsın aşkım?',
                       icon: Icons.sentiment_satisfied_alt,
                       color: AppTheme.primaryPink,
                       onTap: () =>
@@ -125,7 +125,7 @@ class CycleDashboard extends StatelessWidget {
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
-                        'Döngü ve yumurtlama tarihleri tahmindir. Tıbbi teşhis veya gebelikten korunma amacıyla kullanılamaz.',
+                        'Elifim, buradaki tarihler sadece birlikte takip etmemiz için tahmin. Sağlığınla ilgili bir konuda doktoruna danışmayı unutma aşkım.',
                         style: Theme.of(context).textTheme.bodySmall,
                       ),
                     ),
@@ -140,7 +140,7 @@ class CycleDashboard extends StatelessWidget {
   }
 
   static String _intimacyLabel(DailyLog log) {
-    if (log.intimacy == null) return 'Seçim yap';
+    if (log.intimacy == null) return 'Bugün nasıl hissediyorsun birtanem?';
     return log.favPosition == null
         ? log.intimacy!
         : '${log.intimacy} • ${log.favPosition}';
@@ -174,7 +174,10 @@ class _Header extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Hoş geldin', style: Theme.of(context).textTheme.bodyMedium),
+              Text(
+                'Hoş geldin Elifimmm',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
               Text(
                 'Mavishim',
                 style: Theme.of(context).textTheme.headlineSmall,
@@ -215,11 +218,11 @@ class _CycleInsightsCard extends StatelessWidget {
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Kişisel Döngü Analizi',
+                  'Elifimin döngü notları',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              Chip(label: Text('%${pattern.confidence} güven')),
+              Chip(label: Text('%${pattern.confidence} birlikte öğrendik')),
             ],
           ),
           const SizedBox(height: 8),

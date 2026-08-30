@@ -64,10 +64,10 @@ class CycleDial extends StatelessWidget {
                   const SizedBox(height: 2),
                   Text(
                     isLate
-                        ? 'Adet Bekleniyor'
+                        ? 'Aşkım, biraz gecikmiş görünüyor'
                         : (daysRemaining == 0
-                              ? 'Bugün Bekleniyor'
-                              : 'Regle $daysRemaining Gün Kaldı'),
+                              ? 'Aşkım, bugün bekliyoruz'
+                              : 'Regline $daysRemaining gün kaldı birtanem'),
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,

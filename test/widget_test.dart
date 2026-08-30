@@ -23,6 +23,9 @@ void main() {
     await tester.tapAt(left);
     await tester.tapAt(left);
     await tester.tapAt(right);
+    await tester.tapAt(right);
+    await tester.tapAt(right);
+    await tester.tapAt(left);
     await tester.pumpAndSettle();
 
     expect(find.bySemanticsLabel('Gizli kilit ekranı'), findsNothing);
@@ -45,6 +48,9 @@ void main() {
     await tester.tapAt(left);
     await tester.tapAt(left);
     await tester.tapAt(right);
+    await tester.tapAt(right);
+    await tester.tapAt(right);
+    await tester.tapAt(left);
     await tester.pumpAndSettle();
     expect(find.bySemanticsLabel('Gizli kilit ekranı'), findsNothing);
     expect(

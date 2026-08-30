@@ -46,7 +46,7 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                 children: [
                   Expanded(
                     child: Text(
-                      'Döngü Takvimi',
+                      'Elifimin Takvimi',
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
                   ),
@@ -139,7 +139,7 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                               Text(
                                 info.hasData
                                     ? '${info.currentCycleDay}. gün • ${info.phaseName}'
-                                    : 'Henüz kayıt yok',
+                                    : 'Henüz kaydımız yok aşkım',
                                 style: TextStyle(
                                   color: info.phaseColor,
                                   fontWeight: FontWeight.w600,
@@ -148,7 +148,7 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                               if (info.hasData) ...[
                                 const SizedBox(height: 4),
                                 Text(
-                                  'Tahmin penceresi: ${DateFormat('d MMM', 'tr_TR').format(info.predictionWindowStart)} – ${DateFormat('d MMM', 'tr_TR').format(info.predictionWindowEnd)}',
+                                  'Aşkım, beklediğimiz aralık: ${DateFormat('d MMM', 'tr_TR').format(info.predictionWindowStart)} – ${DateFormat('d MMM', 'tr_TR').format(info.predictionWindowEnd)}',
                                   style: Theme.of(context).textTheme.bodySmall,
                                 ),
                               ],
@@ -165,7 +165,9 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                           icon: Icon(
                             isStart ? Icons.delete_outline : Icons.add,
                           ),
-                          label: Text(isStart ? 'Sil' : 'Regl Ekle'),
+                          label: Text(
+                            isStart ? 'Kaydı Kaldır' : 'Reglini İşaretle',
+                          ),
                         ),
                       ],
                     ),
@@ -173,8 +175,8 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                     if (_isEditableDate(_selectedDay)) ...[
                       _RecordTile(
                         icon: Icons.sentiment_satisfied_alt,
-                        title: 'Günlük Mod',
-                        value: selectedLog.mood ?? 'Ekle',
+                        title: 'Bugün nasılsın aşkım?',
+                        value: selectedLog.mood ?? 'Bana anlat birtanem',
                         color: AppTheme.primaryPink,
                         onTap: () => DailyLogPicker.showMood(
                           context,
@@ -185,8 +187,8 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                       const SizedBox(height: 8),
                       _RecordTile(
                         icon: Icons.local_fire_department,
-                        title: 'Günlük İstek',
-                        value: selectedLog.intimacy ?? 'Ekle',
+                        title: 'Bugün ne hissediyorsun?',
+                        value: selectedLog.intimacy ?? 'Bana söyle ömrümm',
                         color: Colors.deepOrange,
                         onTap: () => DailyLogPicker.showIntimacy(
                           context,
@@ -197,13 +199,13 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                       const Divider(height: 28),
                     ] else if (!selectedLog.isEmpty) ...[
                       if (selectedLog.mood != null)
-                        Text('Günlük mod: ${selectedLog.mood}'),
+                        Text('O günkü modun: ${selectedLog.mood}'),
                       if (selectedLog.intimacy != null)
-                        Text('Günlük istek: ${selectedLog.intimacy}'),
+                        Text('O günkü hislerin: ${selectedLog.intimacy}'),
                       const Divider(height: 28),
                     ],
                     Text(
-                      'Beklenen ruh hali',
+                      'Bugün kendini böyle hissedebilirsin aşkım',
                       style: Theme.of(context).textTheme.titleSmall,
                     ),
                     const SizedBox(height: 6),
@@ -222,7 +224,7 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
                     if (info.expectedSymptoms.isNotEmpty) ...[
                       const SizedBox(height: 12),
                       Text(
-                        'Beklenen belirtiler',
+                        'Vücudun bunları hissettirebilir birtanem',
                         style: Theme.of(context).textTheme.titleSmall,
                       ),
                       const SizedBox(height: 6),
@@ -275,7 +277,7 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
       final removed = await provider.removePeriodDate(_selectedDay);
       if (!mounted || !removed) return;
       messenger.showSnackBar(
-        const SnackBar(content: Text('Regl kaydı silindi.')),
+        const SnackBar(content: Text('Tamam aşkım, o kaydı kaldırdım.')),
       );
       return;
     }
@@ -283,7 +285,9 @@ class _CycleCalendarViewState extends State<CycleCalendarView> {
     if (!mounted) return;
     messenger.showSnackBar(
       SnackBar(
-        content: Text(error ?? 'Regl başlangıç tarihi kaydedildi.'),
+        content: Text(
+          error ?? 'İlk günü işaretledim aşkım, birlikte takipteyiz. ❤️',
+        ),
         backgroundColor: error == null ? null : Colors.red.shade700,
       ),
     );

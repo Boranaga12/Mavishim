@@ -7,6 +7,7 @@ import 'providers/tap_effects_provider.dart';
 import 'views/main_navigation.dart';
 import 'widgets/mobile_frame_wrapper.dart';
 import 'widgets/security_lock_screen.dart';
+import 'widgets/mandatory_update_gate.dart';
 import 'data/repositories/app_repository.dart';
 import 'data/repositories/secure_local_repository.dart';
 import 'l10n/generated/app_localizations.dart';
@@ -45,9 +46,11 @@ class _MavishimBootstrapState extends State<MavishimBootstrap> {
       future: _initialization,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return MavishimApp(
-            repository: snapshot.data!.$1,
-            snapshot: snapshot.data!.$2,
+          return MandatoryUpdateGate(
+            child: MavishimApp(
+              repository: snapshot.data!.$1,
+              snapshot: snapshot.data!.$2,
+            ),
           );
         }
         if (snapshot.hasError) {
