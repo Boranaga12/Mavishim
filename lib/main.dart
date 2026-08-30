@@ -142,6 +142,9 @@ class MavishimApp extends StatelessWidget {
             final mediaQuery = MediaQuery.of(context);
             return MediaQuery(
               data: mediaQuery.copyWith(
+                // Keep the app's game and touch feedback animations readable
+                // even when the device has a reduced-animation preference.
+                disableAnimations: false,
                 textScaler: mediaQuery.textScaler.clamp(
                   minScaleFactor: 1,
                   maxScaleFactor: 1.6,

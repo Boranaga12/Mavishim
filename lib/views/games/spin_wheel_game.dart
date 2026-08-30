@@ -35,7 +35,8 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
     );
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 4),
+      duration: const Duration(seconds: 6),
+      animationBehavior: AnimationBehavior.preserve,
     );
   }
 
@@ -60,7 +61,7 @@ class _SpinWheelGameViewState extends State<SpinWheelGameView>
     _animation = Tween<double>(
       begin: _currentAngle,
       end: finalAngle,
-    ).animate(CurvedAnimation(parent: _controller, curve: Curves.decelerate));
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeOutQuart));
 
     _controller.forward(from: 0.0).then((_) {
       if (!mounted) return;

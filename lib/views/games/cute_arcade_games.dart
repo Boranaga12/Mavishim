@@ -813,19 +813,23 @@ class _CuteArcadeGameViewState extends State<CuteArcadeGameView>
     _confetti = ConfettiController(duration: const Duration(milliseconds: 900));
     _aimMotion = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 420),
+      duration: const Duration(milliseconds: 1050),
+      animationBehavior: AnimationBehavior.preserve,
     )..repeat(reverse: true);
     _powerMotion = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 1000),
+      animationBehavior: AnimationBehavior.preserve,
     );
     _angleMotion = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 1200),
+      animationBehavior: AnimationBehavior.preserve,
     );
     _launchMotion = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
+      duration: const Duration(milliseconds: 2200),
+      animationBehavior: AnimationBehavior.preserve,
     );
     _stopwatch.start();
     _resetRound();

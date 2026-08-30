@@ -64,9 +64,9 @@ class _TapEffectsLayerState extends State<TapEffectsLayer>
     final now = DateTime.now();
     final isDoubleTap =
         _lastTapAt != null &&
-        now.difference(_lastTapAt!) < const Duration(milliseconds: 280) &&
+        now.difference(_lastTapAt!) < const Duration(milliseconds: 360) &&
         _lastTapPosition != null &&
-        (position - _lastTapPosition!).distance < 28;
+        (position - _lastTapPosition!).distance < 42;
     _lastTapAt = now;
     _lastTapPosition = position;
 
@@ -170,24 +170,24 @@ class _HeartOverlay extends StatelessWidget {
         if (hearts.isEmpty) return const SizedBox.shrink();
         return ValueListenableBuilder<double>(
           valueListenable: scrollOffset,
-          child: RepaintBoundary(
+          builder: (_, offset, _) => RepaintBoundary(
             child: Stack(
               children: [
                 for (final heart in hearts)
-                  Positioned(
-                    left: heart.x * size.width - 13,
-                    top: heart.contentY - 13,
-                    child: const Icon(
-                      Icons.favorite,
-                      color: Color(0xFF1877F2),
-                      size: 27,
+                  if (heart.contentY - offset >= -32 &&
+                      heart.contentY - offset <= size.height + 32)
+                    Positioned(
+                      left: heart.x * size.width - 13,
+                      top: heart.contentY - offset - 13,
+                      child: const Icon(
+                        Icons.favorite,
+                        color: Color(0xFF1877F2),
+                        size: 27,
+                      ),
                     ),
-                  ),
               ],
             ),
           ),
-          builder: (_, offset, child) =>
-              Transform.translate(offset: Offset(0, -offset), child: child),
         );
       },
     );
@@ -215,7 +215,8 @@ class _TapBurst {
   _TapBurst(this.origin, Random random, TickerProvider vsync)
     : controller = AnimationController(
         vsync: vsync,
-        duration: const Duration(milliseconds: 900),
+        duration: const Duration(milliseconds: 1150),
+        animationBehavior: AnimationBehavior.preserve,
       ),
       particles = List.generate(6, (_) => _Particle(random));
 }
